@@ -1,0 +1,58 @@
+#this bit imports pandas and other data processing packages that makes this project easier
+import pandas as pd
+import datetime
+from numpy import random
+import matplotlib.pyplot as plt
+import sys #only needed to determine Python version number
+import matplotlib #only needed to determine Matplotlib version number and to use for data analysis, super fun
+
+#creates two dataframes from csv files 
+Location = r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\VINTON.csv'
+df = pd.read_csv(Location)
+Location2 = r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\VINTON2.csv'
+Location3 = r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\empty.csv'
+df2 = pd.read_csv(Location2)
+df3 = pd.read_csv(Location3)
+#add columns to the present dataframes for the old voter status
+df['Old_Status'] = ("NA")
+df2['Old_Status'] = df['VOTER_STATUS']
+df3['Old_Status'] = ("NA")
+#now do the same thing for party affiliation
+df['OLD_PARTY_AFFILIATION'] = ("NA")
+df2['OLD_PARTY_AFFILIATION'] = df['PARTY_AFFILIATION']
+df3['OLD_PARTY_AFFILIATION'] = ("NA")
+#add columns for date of Voter Status
+today = datetime.date.today()
+df['Date_status_change'] = df2['Date_status_change'] = df3['Date_status_change'] = (today)
+x = 0
+y = 0
+a = 0
+#the two loops run through the dataframes to check for changes in each
+z = len(df.index)-1
+o = len(df2.index) - 1
+while x < z:
+    s = df.iloc[x]
+    x = x+1
+    y = 0
+    for y in range(o):
+        u = df2.iloc[y]
+        y = y+1
+        if s['SOS_VOTERID'] != u['SOS_VOTERID']:
+            pass
+            
+        else: 
+            if s['VOTER_STATUS'] != u['VOTER_STATUS']:
+                df3.iloc[a] = u
+                print(s['VOTER_STATUS'] + ' ' + u['VOTER_STATUS'])
+                a = a + 1
+            if s['PARTY_AFFILIATION'] != u['PARTY_AFFILIATION']:
+                df3.iloc[a] = u
+                a = a + 1
+            if s['LAST_NAME'] != u['LAST_NAME']:
+                df3.iloc[a] = u
+                a = a + 1
+            if s['RESIDENTIAL_ADDRESS1'] != u['RESIDENTIAL_ADDRESS1']:
+                df3.iloc[a] = u
+                a = a + 1
+            break
+df3.to_csv(r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\change.csv')

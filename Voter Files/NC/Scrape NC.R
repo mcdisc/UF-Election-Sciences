@@ -544,6 +544,11 @@ combinedtemp <- NULL
 
 write.table(currentweek, lastweekfile, sep = ",", quote = TRUE, dec = ".", col.names = TRUE, row.names = FALSE)
 
+# Write stats file
+
+statsfile <- paste(working.dir,"NCstats.csv",sep="")
+write.table(NC.stats, statsfile, sep = ",", quote = TRUE, dec = ".", col.names = TRUE, row.names = FALSE)
+
 # delete zip and text file from scratch directory
 
 file.remove(paste(working.dir,"ncvoter_Statewide.zip",sep=""))

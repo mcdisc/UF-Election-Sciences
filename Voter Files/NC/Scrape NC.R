@@ -30,11 +30,10 @@ countycodes <- read.csv(countycodesfile, header = TRUE, colClasses = c("characte
 countycodes$County <- as.numeric(countycodes$County)
 
 # On first run, initialize NC.stats, where stats from queries are stored
+# NC.stats <- subset(countycodes,select = "County")
 
-NC.stats <- subset(countycodes,select = "County")
-
-# In future, need to save and load NC.stats
-
+NCstatsfile <- paste(working.dir,"NCstats.csv",sep="")
+NC.stats <- read.csv(NCstatsfile, header = TRUE)
 
 # Load and fortify county shapefile
 
@@ -43,7 +42,7 @@ county.map <- fortify(county.map, region = "COUNTYFP10")
 
 # Load logo image
 logo <- readPNG("D:/Research/Turnout/Voter Files/Analyze/USelections_logo_web.png")
-g <- rasterGrob(logo, interpolate=TRUE)
+logo.grob <- rasterGrob(logo, interpolate=TRUE)
 
 ###############
 # SCRAPE FILE #
@@ -64,8 +63,16 @@ download.file(url, destfile, mode = "wb")
 # set destination directory for zip file
 
 current.week.file <- paste(working.dir,"ncvoter_Statewide.txt", sep="")
+last.week.file <- paste(working.dir,"ncvoter_Statewide_last.txt", sep="")
 
-file.remove(current.week.file)
+# file.remove(current.week.file)
+# need automate rename current week to last week
+
+if (file.exists(last.week.file)) {
+  file.remove(last.week.file)
+}
+
+file.rename(current.week.file, last.week.file)
 
 zipdest = "D:/Research/Turnout/Voter Files/Analyze/NC"
 
@@ -79,15 +86,16 @@ current.date <- paste(substr(current.date,1,4),substr(current.date,6,7),substr(c
 # current.date <- "20160813"
 
 # Archive current week zip file using creation date of file to create directory
-# (Need to check if file exists, if not, do these steps)
 
-dir.create(paste(archive.dir,current.date,sep=""))
+archive.file <- paste(archive.dir,current.date,"/ncvoter_Statewide.zip",sep="")
+archive.file
 
-# move zip file to archive
+file.exists(archive.file)
 
-file.copy(paste(working.dir,"ncvoter_Statewide.zip",sep=""),paste(archive.dir,current.date, "/ncvoter_Statewide.zip",sep=""))
-
-paste(archive.dir,current.date, "ncvoter_Statewide.zip",sep="")
+if (identical(file.exists(archive.file),FALSE)) {
+  dir.create(paste(archive.dir,current.date,sep=""))  
+  file.copy(paste(working.dir,"ncvoter_Statewide.zip",sep=""),paste(archive.dir,current.date, "/ncvoter_Statewide.zip",sep=""))
+}
 
 ####################
 # READ DATA INTO R #
@@ -107,8 +115,8 @@ currentweek <- read.csv(current.week.file, header = TRUE, sep = "\t", quote = "\
 
 # Load last week file 
 
-lastweekfile <- "D:/Research/Turnout/Voter Files/Analyze/NC/ncvoter_Statewide_last.txt"
-lastweek <- read.csv(lastweekfile, header = TRUE, sep = "\t", quote = "\"", dec = ".", fill = TRUE, colClasses = readcolumns)
+# lastweekfile <- "D:/Research/Turnout/Voter Files/Analyze/NC/ncvoter_Statewide_last.txt"
+lastweek <- read.csv(last.week.file, header = TRUE, sep = "\t", quote = "\"", dec = ".", fill = TRUE, colClasses = readcolumns)
 
 # lastweekfile <- "D:/Research/Turnout/Voter Files/Analyze/NC/lastweek.csv"
 # lastweek <- read.csv(lastweekfile, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE)
@@ -343,10 +351,6 @@ scale_fill_distiller(name="Purged Voter Rate", palette = "YlGn", na.value = 'whi
 save.image.file <- paste(working.dir,"NC_purged_rate_",current.date,".jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
 
-county.map$filldata <- NULL
-county.map$County <- NULL
-combinedtemp <- NULL
-
 #########################
 # Purged Voters         #
 #########################
@@ -356,15 +360,21 @@ combinedtemp <- NULL
 
 combinedtemp <- merge(x = last.temp, y = current.temp, by.x = c("voter_reg_num_last","county_id_last"), by.y = c("voter_reg_num","county_id"), all.x = TRUE)
 
-query1 <-sqldf("SELECT county_id_last, voter_reg_num_last FROM combinedtemp WHERE (((status_cd_last='A') AND ((status_cd='D') OR (status_cd='R'))) OR ((status_cd_last='I') AND ((status_cd='D') OR (status_cd='R'))) OR ((status_cd_last='S') AND ((status_cd='D') OR (status_cd='R'))))")
+query1 <-sqldf("SELECT county_id_last, voter_reg_num_last, party_cd_last, race_code_last, ethnic_code_last FROM combinedtemp WHERE (((status_cd_last='A') AND ((status_cd='D') OR (status_cd='R'))) OR ((status_cd_last='I') AND ((status_cd='D') OR (status_cd='R'))) OR ((status_cd_last='S') AND ((status_cd='D') OR (status_cd='R'))))")
 query2 <-sqldf("SELECT county_id_last, COUNT(voter_reg_num_last) AS filldata FROM query1 GROUP BY county_id_last")
+
+# Total
 
 temp <- merge(x = countycodes, y = query2, by.x = "County", by.y= "county_id_last", all.x=TRUE)
 
 temp.stats <- subset(temp,select = c("County","filldata"))
 colnames(temp.stats)[2] = paste("purged.records.",current.date,sep="")
 NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
-NC.stats
+
+# Create County Map Grob
+
+county.map <- readShapePoly("D:/Research/Turnout/Voter Files/Analyze/NC/tl_2010_37_county10.shp")
+county.map <- fortify(county.map, region = "COUNTYFP10")
 
 county.map <- merge(x = county.map, y = temp, by.x = "id", by.y = "COUNTYFP10", all.x = TRUE, sort=FALSE)
 
@@ -373,24 +383,132 @@ titletxt <- paste("North Carolina Purged Registrations in Week Ending ",substr(c
 map.grob <- ggplotGrob(ggplot() +
   geom_polygon(data=county.map, aes(x=long,y=lat, group=group, fill=filldata), color="black") +
   coord_map() +
-  scale_fill_distiller(name="Purged Reg", palette = "YlGn", na.value = 'white')+
-  theme_nothing(legend = TRUE)+
+  scale_fill_distiller(name="Purged Reg", palette = rev("YlGn"), trans = "reverse", na.value = 'white') +
+  guides(fill = guide_legend(reverse = TRUE, nbin= 5, nrow=5)) +
+  theme_nothing(legend = TRUE) +
   labs(title=titletxt))
+
+# Bar Chart by Party
+
+# Democrats
+
+query2 <-sqldf("SELECT county_id_last, COUNT(voter_reg_num_last) AS filldata FROM query1 WHERE party_cd_last='DEM' GROUP BY county_id_last")
+
+temp <- merge(x = countycodes, y = query2, by.x = "County", by.y= "county_id_last", all.x=TRUE)
+
+temp.stats <- subset(temp,select = c("County","filldata"))
+colnames(temp.stats)[2] = paste("purged.records.D.",current.date,sep="")
+NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
+
+# Republicans
+
+query2 <-sqldf("SELECT county_id_last, COUNT(voter_reg_num_last) AS filldata FROM query1 WHERE party_cd_last='REP' GROUP BY county_id_last")
+
+temp <- merge(x = countycodes, y = query2, by.x = "County", by.y= "county_id_last", all.x=TRUE)
+
+temp.stats <- subset(temp,select = c("County","filldata"))
+colnames(temp.stats)[2] = paste("purged.records.R.",current.date,sep="")
+NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
+
+# Unaffiliated
+
+query2 <-sqldf("SELECT county_id_last, COUNT(voter_reg_num_last) AS filldata FROM query1 WHERE party_cd_last='UNA' GROUP BY county_id_last")
+
+temp <- merge(x = countycodes, y = query2, by.x = "County", by.y= "county_id_last", all.x=TRUE)
+
+temp.stats <- subset(temp,select = c("County","filldata"))
+colnames(temp.stats)[2] = paste("purged.records.U.",current.date,sep="")
+NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
+
+purged.T <- sum(eval(parse(text=paste("NC.stats$purged.records.",current.date,sep=""))),na.rm=TRUE)
+purged.D <- sum(eval(parse(text=paste("NC.stats$purged.records.D.",current.date,sep=""))),na.rm=TRUE)
+purged.R <- sum(eval(parse(text=paste("NC.stats$purged.records.R.",current.date,sep=""))),na.rm=TRUE)
+purged.U <- sum(eval(parse(text=paste("NC.stats$purged.records.U.",current.date,sep=""))),na.rm=TRUE)
+purged.M <- purged.T - purged.D - purged.R - purged.U
+
+purged.party <- data.frame(Party=c("Dem","Rep","Unaf","Lib"),Purged = c(purged.D, purged.R, purged.U, purged.M))
+
+bar.party.grob <- ggplotGrob(ggplot(data = purged.party,aes(x = Party, y = Purged, fill=Party)) + 
+ scale_fill_manual(values=c("darkblue","orange","red","yellow")) +
+ geom_bar(stat="identity") +
+ labs(y = "Purged Reg", x = "") +
+ guides(fill=FALSE) +
+ theme_minimal())
+
+# Bar chart by Race
+
+# NH Black
+
+query2 <-sqldf("SELECT county_id_last, COUNT(voter_reg_num_last) AS filldata FROM query1 WHERE ((race_code_last='B') AND (ethnic_code_last='NL' OR ethnic_code_last='UN')) GROUP BY county_id_last")
+
+temp <- merge(x = countycodes, y = query2, by.x = "County", by.y= "county_id_last", all.x=TRUE)
+
+temp.stats <- subset(temp,select = c("County","filldata"))
+colnames(temp.stats)[2] = paste("purged.records.B.",current.date,sep="")
+NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
+
+# NH White
+
+query2 <-sqldf("SELECT county_id_last, COUNT(voter_reg_num_last) AS filldata FROM query1 WHERE ((race_code_last='W') AND (ethnic_code_last='NL' OR ethnic_code_last='UN')) GROUP BY county_id_last")
+
+temp <- merge(x = countycodes, y = query2, by.x = "County", by.y= "county_id_last", all.x=TRUE)
+
+temp.stats <- subset(temp,select = c("County","filldata"))
+colnames(temp.stats)[2] = paste("purged.records.W.",current.date,sep="")
+NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
+
+# NH Asian
+
+query2 <-sqldf("SELECT county_id_last, COUNT(voter_reg_num_last) AS filldata FROM query1 WHERE ((race_code_last='A') AND (ethnic_code_last='NL' OR ethnic_code_last='UN')) GROUP BY county_id_last")
+
+temp <- merge(x = countycodes, y = query2, by.x = "County", by.y= "county_id_last", all.x=TRUE)
+
+temp.stats <- subset(temp,select = c("County","filldata"))
+colnames(temp.stats)[2] = paste("purged.records.A.",current.date,sep="")
+NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
+
+# Hispanic
+
+query2 <-sqldf("SELECT county_id_last, COUNT(voter_reg_num_last) AS filldata FROM query1 WHERE (ethnic_code_last='HL') GROUP BY county_id_last")
+
+temp <- merge(x = countycodes, y = query2, by.x = "County", by.y= "county_id_last", all.x=TRUE)
+
+temp.stats <- subset(temp,select = c("County","filldata"))
+colnames(temp.stats)[2] = paste("purged.records.H.",current.date,sep="")
+NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
+
+purged.B <- sum(eval(parse(text=paste("NC.stats$purged.records.B.",current.date,sep=""))),na.rm=TRUE)
+purged.W <- sum(eval(parse(text=paste("NC.stats$purged.records.W.",current.date,sep=""))),na.rm=TRUE)
+purged.A <- sum(eval(parse(text=paste("NC.stats$purged.records.A.",current.date,sep=""))),na.rm=TRUE)
+purged.H <- sum(eval(parse(text=paste("NC.stats$purged.records.H.",current.date,sep=""))),na.rm=TRUE)
+purged.O <- purged.T - purged.B - purged.W - purged.A - purged.H
+
+purged.race <- data.frame(Race=c("Black","White","Asian","Hisp","Other"), Purged = c(purged.B, purged.W, purged.A, purged.H, purged.O))
+
+bar.race.grob <- ggplotGrob(ggplot(data = purged.race,aes(x=Race, y = Purged ,fill=Race)) + 
+ scale_fill_manual(values=c("thistle1","grey20","gold","coral3","snow2")) +
+ geom_bar(stat="identity") +
+ labs(y = "Purged Reg", x = "") +
+ guides(fill=FALSE) +
+ theme_minimal())
 
 base <- data.frame(x = 1:10 , y = 1:5)
 ggplot(base, aes(x, y)) +
   theme_nothing() +
-  annotation_custom(map.grob, xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf) +
+  annotation_custom(map.grob, xmin=-Inf, xmax=Inf, ymin=2.3, ymax=5) +
   annotation_custom(logo.grob, xmin=1, xmax=3, ymin=1, ymax=2.5) +
-  annotate("text",x=9,y=1.65,label="www.electproject.org")
+  annotation_custom(bar.party.grob, xmin=7, xmax=10, ymin=1.1, ymax=2.4) +
+  annotation_custom(bar.race.grob, xmin=3.2, xmax=7.1, ymin=1.1, ymax=2.4) +
+  annotate("text",x=1.9,y=1.45,label="www.electproject.org")
 
 save.image.file <- paste(working.dir,"NC_purged_",current.date,".jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
 
-
 #########################
 # New Registered Voters #
 #########################
+#
+#
 
 combinedtemp <- merge(x = current.temp, y = last.temp, by.x =c("voter_reg_num", "county_id"), by.y = c("voter_reg_num_last", "county_id_last"), all.x = TRUE)
 
@@ -398,9 +516,8 @@ combinedtemp <- merge(x = current.temp, y = last.temp, by.x =c("voter_reg_num", 
 
 # All registered voters
 
-query<-sqldf("SELECT county_id, COUNT(voter_reg_num) AS filldata FROM combinedtemp WHERE status_cd_last is null GROUP BY county_id") 
-
-temp <- merge(x = countycodes, y = query, by.x = "County", by.y= "county_id_last", all.x=TRUE)
+query<-sqldf("SELECT county_id, COUNT(voter_reg_num) AS filldata FROM combinedtemp WHERE (status_cd_last is null) GROUP BY county_id") 
+temp <- merge(x = countycodes, y = query, by.x = "County", by.y= "county_id", all.x=TRUE)
 
 temp.stats <- subset(temp,select = c("County","filldata"))
 colnames(temp.stats)[2] = paste("new.reg.",current.date,sep="")
@@ -409,17 +526,16 @@ NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
 # Democrats
 
 query<-sqldf("SELECT county_id, COUNT(voter_reg_num) AS filldata FROM combinedtemp WHERE ((status_cd_last is null) AND (party_cd='DEM')) GROUP BY county_id") 
-
 temp <- merge(x = countycodes, y = query, by.x = "County", by.y= "county_id", all.x=TRUE)
 
 temp.stats <- subset(temp,select = c("County","filldata"))
 colnames(temp.stats)[2] = paste("new.reg.D.",current.date,sep="")
 NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
 
+
 # Republicans
 
 query<-sqldf("SELECT county_id, COUNT(voter_reg_num) AS filldata FROM combinedtemp WHERE ((status_cd_last is null) AND (party_cd='REP')) GROUP BY county_id") 
-
 temp <- merge(x = countycodes, y = query, by.x = "County", by.y= "county_id", all.x=TRUE)
 
 temp.stats <- subset(temp,select = c("County","filldata"))
@@ -429,7 +545,7 @@ NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
 # Unaffiliated
 
 query<-sqldf("SELECT county_id, COUNT(voter_reg_num) AS filldata FROM combinedtemp WHERE ((status_cd_last is null) AND (party_cd='UNA')) GROUP BY county_id") 
-
+query
 temp <- merge(x = countycodes, y = query, by.x = "County", by.y= "county_id", all.x=TRUE)
 
 temp.stats <- subset(temp,select = c("County","filldata"))
@@ -441,6 +557,12 @@ new.D <- sum(eval(parse(text=paste("NC.stats$new.reg.D.",current.date,sep=""))),
 new.R <- sum(eval(parse(text=paste("NC.stats$new.reg.R.",current.date,sep=""))),na.rm=TRUE)
 new.U <- sum(eval(parse(text=paste("NC.stats$new.reg.U.",current.date,sep=""))),na.rm=TRUE)
 new.M <- new.T - new.D - new.R - new.U
+
+new.T
+new.D
+new.R
+new.U
+new.M
 
 new.reg.party <- data.frame(Party=c("Dem","Rep","Unaf","Lib"),Registrations = c(new.D, new.R, new.U, new.M))
 
@@ -515,7 +637,8 @@ titletxt <- paste("North Carolina New Registered Voters in Week Ending ",substr(
 map.grob <- ggplotGrob(ggplot() +
   geom_polygon(data=county.map, aes(x=long,y=lat, group=group, fill=filldata), color="black") +
   coord_map() +
-  scale_fill_distiller(name="New Reg", palette = "YlGn", na.value = 'white')+
+  scale_fill_distiller(name="New Reg", palette = rev("YlGn"), trans = "reverse", na.value = 'white') +
+  guides(fill = guide_legend(reverse = TRUE, nbin= 5, nrow=5)) +
   theme_nothing(legend = TRUE)+
   labs(title=titletxt))
 
@@ -526,7 +649,7 @@ ggplot(base, aes(x, y)) +
   annotation_custom(logo.grob, xmin=1, xmax=3, ymin=1, ymax=2.5) +
   annotation_custom(bar.party.grob, xmin=7, xmax=10, ymin=1.1, ymax=2.4) +
   annotation_custom(bar.race.grob, xmin=4, xmax=7, ymin=1.1, ymax=2.4) +
-  annotate("text",x=1.8,y=1.4,label="www.electproject.org")
+  annotate("text",x=1.85,y=1.45,label="www.electproject.org")
 
 save.image.file <- paste(working.dir,"NC_newreg_",current.date,".jpg", sep="")
 ggsave(save.image.file, device = "jpeg")

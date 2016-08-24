@@ -1,0 +1,67 @@
+FL,12,"001",Alachua County,H1
+FL,12,"003",Baker County,H1
+FL,12,"005",Bay County,H1
+FL,12,"007",Bradford County,H1
+FL,12,"009",Brevard County,H1
+FL,12,"011",Broward County,H1
+FL,12,"013",Calhoun County,H1
+FL,12,"015",Charlotte County,H1
+FL,12,"017",Citrus County,H1
+FL,12,"019",Clay County,H1
+FL,12,"021",Collier County,H1
+FL,12,"023",Columbia County,H1
+FL,12,"027",DeSoto County,H1
+FL,12,"029",Dixie County,H1
+FL,12,"031",Duval County,H6
+FL,12,"033",Escambia County,H1
+FL,12,"035",Flagler County,H1
+FL,12,"037",Franklin County,H1
+FL,12,"039",Gadsden County,H1
+FL,12,"041",Gilchrist County,H1
+FL,12,"043",Glades County,H1
+FL,12,"045",Gulf County,H1
+FL,12,"047",Hamilton County,H1
+FL,12,"049",Hardee County,H1
+FL,12,"051",Hendry County,H1
+FL,12,"053",Hernando County,H1
+FL,12,"055",Highlands County,H1
+FL,12,"057",Hillsborough County,H1
+FL,12,"059",Holmes County,H1
+FL,12,"061",Indian River County,H1
+FL,12,"063",Jackson County,H1
+FL,12,"065",Jefferson County,H1
+FL,12,"067",Lafayette County,H1
+FL,12,"069",Lake County,H1
+FL,12,"071",Lee County,H1
+FL,12,"073",Leon County,H1
+FL,12,"075",Levy County,H1
+FL,12,"077",Liberty County,H1
+FL,12,"079",Madison County,H1
+FL,12,"081",Manatee County,H1
+FL,12,"083",Marion County,H1
+FL,12,"085",Martin County,H1
+FL,12,"086",Miami-Dade County,H1
+FL,12,"087",Monroe County,H1
+FL,12,"089",Nassau County,H1
+FL,12,"091",Okaloosa County,H1
+FL,12,"093",Okeechobee County,H1
+FL,12,"095",Orange County,H1
+FL,12,"097",Osceola County,H1
+FL,12,"099",Palm Beach County,H1
+FL,12,"101",Pasco County,H1
+FL,12,"103",Pinellas County,H1
+FL,12,"105",Polk County,H1
+FL,12,"107",Putnam County,H1
+FL,12,"109",St. Johns County,H1
+FL,12,"111",St. Lucie County,H1
+FL,12,"113",Santa Rosa County,H1
+FL,12,"115",Sarasota County,H1
+FL,12,"117",Seminole County,H1
+FL,12,"119",Sumter County,H1
+FL,12,"121",Suwannee County,H1
+FL,12,"123",Taylor County,H1
+FL,12,"125",Union County,H1
+FL,12,"127",Volusia County,H1
+FL,12,"129",Wakulla County,H1
+FL,12,"131",Walton County,H1
+FL,12,"133",Washington County,H1

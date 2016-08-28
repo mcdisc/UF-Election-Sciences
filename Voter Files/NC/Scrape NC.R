@@ -504,6 +504,51 @@ ggplot(base, aes(x, y)) +
 save.image.file <- paste(working.dir,"NC_purged_",current.date,".jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
 
+#######################
+# Purged Reg Age Plot #
+######################3
+#
+# Experimenting with this still
+#
+
+query1 <-sqldf("SELECT voter_reg_num_last, birth_age, party_cd FROM combinedtemp WHERE ((((status_cd_last='A') AND ((status_cd='D') OR (status_cd='R'))) OR ((status_cd_last='I') AND ((status_cd='D') OR (status_cd='R'))) OR ((status_cd_last='S') AND ((status_cd='D') OR (status_cd='R')))) and (birth_age<100))")
+query2<-sqldf("SELECT birth_age, party_cd, COUNT(voter_reg_num_last) AS filldata FROM query1 GROUP BY birth_age, party_cd") 
+
+birth_age<-rep(min(query2$birth_age):max(query2$birth_age), each= 4)
+party_cd <- c("DEM", "LIB", "REP", "UNA")
+blank.table <- data.frame(cbind(birth_age,party_cd))
+
+bartable <- merge(x = query2, y = blank.table, by.x = c("birth_age","party_cd"), all.y= TRUE)
+
+bartable$filldata[is.na(bartable$filldata)] <- 0
+
+bartable$birth_age<-as.factor(bartable$birth_age)
+
+levels(bartable$birth_age)
+levels(bartable$party_cd)
+
+ages<- nlevels(birth_age)
+parties <- nlevels(party_cd)
+
+data = bartable$filldata
+data = matrix(data, ncol = nlevels(bartable$birth_age), byrow = FALSE)
+
+colnames(data)=levels(bartable$birth_age)
+rownames(data)=levels(bartable$party_cd)
+
+par(mar=c(5.1, 4.1, 4.1, 7.1), xpd=TRUE)
+barplot(data, main = "NC Purged Voter Registrations in Week Ending 8/27", xlab = "Age", ylab ="New Reg", col=c("blue","green","red","yellow"), ylim=c(0, 80), width=2)
+legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
+
+save.image.file <- paste(working.dir,"NC_purged_by_age_",current.date,".png", sep="")
+
+png(file = save.image.file)
+barplot(data, main = "NC Purged Voter Registrations in Week Ending 8/27", xlab = "Age", ylab ="New Reg", col=c("blue","green","red","yellow"), ylim=c(0, 80), width=2)
+legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
+dev.off()
+
+
+
 #########################
 # New Registered Voters #
 #########################
@@ -654,9 +699,52 @@ ggplot(base, aes(x, y)) +
 save.image.file <- paste(working.dir,"NC_newreg_",current.date,".jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
 
-county.map$filldata <- NULL
-county.map$County <- NULL
-combinedtemp <- NULL
+####################
+# New Reg Age Plot #
+####################
+#
+# Experimenting with this still
+#
+
+query1<-sqldf("SELECT birth_age_last, party_cd_last, voter_reg_num_last FROM combinedtemp WHERE ((status_cd is null) and (birth_age_last<100))") 
+query2<-sqldf("SELECT birth_age_last, party_cd_last , COUNT(voter_reg_num_last) AS filldata FROM query1 GROUP BY birth_age_last, party_cd_last") 
+
+birth_age_last<-rep(min(query2$birth_age_last):max(query2$birth_age_last), each= 4)
+party_cd_last <- c("DEM", "LIB", "REP", "UNA")
+blank.table <- data.frame(cbind(birth_age_last,party_cd_last))
+
+bartable <- merge(x = query2, y = blank.table, by.x = c("birth_age_last","party_cd_last"), all.y= TRUE)
+
+bartable$filldata[is.na(bartable$filldata)] <- 0
+
+bartable$birth_age_last<-as.factor(bartable$birth_age_last)
+
+levels(bartable$birth_age_last)
+levels(bartable$party_cd_last)
+
+ages<- nlevels(birth_age_last)
+parties <- nlevels(party_cd_last)
+
+data = bartable$filldata
+data = matrix(data, ncol = nlevels(bartable$birth_age_last), byrow = FALSE)
+
+colnames(data)=levels(bartable$birth_age_last)
+rownames(data)=levels(bartable$party_cd_last)
+
+par(mar=c(5.1, 4.1, 4.1, 7.1), xpd=TRUE)
+barplot(data, main = "NC Purged Voter Registrations in Week Ending 8/27", xlab = "Age", ylab ="Purged Reg", col=c("blue","green","red","yellow"), ylim=c(0, 1000), width=2)
+legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
+
+save.image.file <- paste(working.dir,"NC_purged_by_age_",current.date,".png", sep="")
+
+png(file = save.image.file)
+barplot(data, main = "NC Purged Voter Registrations in Week Ending 8/27", xlab = "Age", ylab ="Purged Reg", col=c("blue","green","red","yellow"), ylim=c(0, 1000), width=2)
+legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
+dev.off()
+
+
+
+ggsave(save.image.file, device = "jpeg")
 
 ############
 # CLEAN UP #
@@ -664,6 +752,7 @@ combinedtemp <- NULL
 #
 # save reduced current week file to scratch directory to use next week, call it lastweek
 #
+
 
 write.table(currentweek, lastweekfile, sep = ",", quote = TRUE, dec = ".", col.names = TRUE, row.names = FALSE)
 

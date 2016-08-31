@@ -1,0 +1,69 @@
+#this bit imports pandas and other data processing packages that makes this project easier
+import pandas as pd
+import datetime
+
+#this section will download the file from Ohio 
+from ftplib import FTP
+ftp = FTP('sosftp.sos.state.oh.us')
+ftp.login()
+ftp.cwd('free/voter')
+ftp.retrlines('LIST')
+ftp.retrbinary('RETR SWVF_1_44.zip', open('SWVF_1_44.zip', 'wb').write)
+ftp.retrbinary('RETR SWVF_45_88.zip', open('SWVF_45_88.zip', 'wb').write)
+ftp.quit()
+
+#unzip the file
+import zipfile 
+zip = zipfile.ZipFile(r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\SWVF_1_44.zip')
+zip.extractall()
+zip = zipfile.ZipFile(r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\SWVF_45_88.zip')
+zip.extractall()
+
+#take the two files and concatenate them
+Location = r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\SWVF_1_44.txt'
+df1 = pd.read_csv(Location, usecols=['COUNTY_NUMBER', 'SOS_VOTERID', 'LAST_NAME', 'FIRST_NAME', 'REGISTRATION_DATE', 'DATE_OF_BIRTH', 'VOTER_STATUS', 'PARTY_AFFILIATION'])
+Location1 = r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\SWVF_45_88.txt'
+df2 = pd.read_csv(Location1, usecols=['COUNTY_NUMBER', 'SOS_VOTERID', 'LAST_NAME', 'FIRST_NAME', 'REGISTRATION_DATE', 'DATE_OF_BIRTH', 'VOTER_STATUS', 'PARTY_AFFILIATION'])
+frames = [df1, df2]
+df_a = pd.concat(frames)
+
+#now save this base file
+#this bit of code only works if it is downloaded the same day they release it
+x = datetime.date.today().strftime("%B-%d-%Y")
+filename = "%s.csv" % x
+df_a.to_csv(filename)
+
+#this is to help with memory issues
+df1 = [0]
+df2 = [0]
+
+#creates two dataframes from csv files, make sure to change location 2 depending on what you want to compare
+#consider using 'RESIDENTIAL_ADDRESS1', 'RESIDENTIAL_CITY', 'RESIDENTIAL_ZIP' depending on what you want out of the file, speed changes based on this choice
+Location2 = r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\Voter Files\August13.txt'
+df_b = pd.read_csv(Location2, usecols=['COUNTY_NUMBER', 'SOS_VOTERID', 'LAST_NAME', 'FIRST_NAME', 'REGISTRATION_DATE', 'DATE_OF_BIRTH', 'VOTER_STATUS', 'PARTY_AFFILIATION'])
+merged = pd.merge(df_a, df_b, on='SOS_VOTERID', how='outer', suffixes=('_week1', '_week2'))
+
+#same as before
+df_a = [0]
+df_b = [0]
+
+
+#locates the differences between the two files and makes a purge file for this week and concatenates it with previous weeks
+purged = merged.loc[pd.isnull(merged.LAST_NAME_week2)]
+purged = purged.loc[pd.isnull(purged.FIRST_NAME_week2)]
+x = datetime.date.today().strftime("%B-%d-%Y")
+purged['Week Purged'] =  x
+df_a = pd.read_csv(r'C:\Users\Tyler\Documents\Data Projects\National Voter Data File\Ohio\Purged.csv')
+del df_a['Unnamed: 0']
+total = pd.concat([df_a, purged])
+total.to_csv('Purged.csv')
+
+#same thing but for new registrations
+newreg = merged.loc[pd.isnull(merged.LAST_NAME_week1)]
+newreg = newreg.loc[pd.isnull(newreg.FIRST_NAME_week1)]
+newreg['Week Reg'] = x
+df_a = pd.read_csv('NewReg.csv')
+totalNR = pd.concat[df_a, newreg]
+totalNR.to_csv('NewReg.csv')
+
+

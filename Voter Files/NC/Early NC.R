@@ -43,6 +43,6 @@ unzip(destfile, exdir=zipdest, overwrite = TRUE)
 
 # readcolumns = c(NA, "NULL", NA, NA, NA, NA, "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", NA, NA, NA, NA, "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", NA, NA, NA, NA, NA)
 
-current <- read.csv(current.file, header = TRUE, sep = "\t", quote = "\"", dec = ".", fill = TRUE)
+current <- read.csv(current.file, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE)
 
 

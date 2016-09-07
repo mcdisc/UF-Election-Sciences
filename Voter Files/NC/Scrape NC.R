@@ -547,8 +547,6 @@ barplot(data, main = "NC Purged Voter Registrations in Week Ending 8/27", xlab =
 legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
 dev.off()
 
-
-
 #########################
 # New Registered Voters #
 #########################

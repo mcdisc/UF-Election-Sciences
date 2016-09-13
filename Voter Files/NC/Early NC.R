@@ -45,4 +45,21 @@ unzip(destfile, exdir=zipdest, overwrite = TRUE)
 
 current <- read.csv(current.file, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE)
 
+dup <- sqldf("SELECT ncid, Count(ncid) AS count FROM current GROUP BY ncid")
+
+query
+
+temp <- merge(x = current, y = dup, by = "ncid", all=TRUE, sort=FALSE)
+
+query <- sqldf("SELECT voter_party_code, Count(voter_party_code) AS req FROM temp WHERE ((count=1) OR ((count>1) AND ((ballot_send_dt !='') AND ((ballot_rtn_status ='') Or (ballot_rtn_status='ACCEPTED'))))) GROUP BY voter_party_code")
+
+ggplot(data = query,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
+ scale_fill_manual(values=c("darkblue","green","red","yellow")) +
+ geom_bar(stat="identity") +
+ labs(y = "Ballot Requests", x = "", title="NC Absentee Ballot Requests as of 9/12") +
+ guides(fill=FALSE) +
+ theme_minimal()
+
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abreq_0912.jpg", sep="")
+ggsave(save.image.file, device = "jpeg")
 

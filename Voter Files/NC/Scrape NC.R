@@ -566,6 +566,20 @@ temp.stats <- subset(temp,select = c("County","filldata"))
 colnames(temp.stats)[2] = paste("new.reg.",current.date,sep="")
 NC.stats <- merge(x = NC.stats, y = temp.stats, by = "County", all=TRUE)
 
+county.map <- readShapePoly("D:/Research/Turnout/Voter Files/Analyze/NC/tl_2010_37_county10.shp")
+county.map <- fortify(county.map, region = "COUNTYFP10")
+county.map <- merge(x = county.map, y = temp, by.x = "id", by.y = "COUNTYFP10", all.x = TRUE, sort=FALSE)
+
+titletxt <- paste("North Carolina New Registered Voters in Week Ending ",substr(current.date,5,6),"/",substr(current.date,7,8),sep="")
+
+map.grob <- ggplotGrob(ggplot() +
+  geom_polygon(data=county.map, aes(x=long,y=lat, group=group, fill=filldata), color="black") +
+  coord_map() +
+  scale_fill_distiller(name="New Reg", palette = rev("YlGn"), trans = "reverse", na.value = 'white') +
+  guides(fill = guide_legend(reverse = TRUE, nbin= 5, nrow=5)) +
+  theme_nothing(legend = TRUE)+
+  labs(title=titletxt))
+
 # Democrats
 
 query<-sqldf("SELECT county_id, COUNT(voter_reg_num) AS filldata FROM combinedtemp WHERE ((status_cd_last is null) AND (party_cd='DEM')) GROUP BY county_id") 
@@ -671,28 +685,14 @@ bar.race.grob <- ggplotGrob(ggplot(data = new.reg.race,aes(x=Race, y = Registrat
  guides(fill=FALSE) +
  theme_minimal())
 
-county.map <- readShapePoly("D:/Research/Turnout/Voter Files/Analyze/NC/tl_2010_37_county10.shp")
-county.map <- fortify(county.map, region = "COUNTYFP10")
-county.map <- merge(x = county.map, y = temp, by.x = "id", by.y = "COUNTYFP10", all.x = TRUE, sort=FALSE)
-
-titletxt <- paste("North Carolina New Registered Voters in Week Ending ",substr(current.date,5,6),"/",substr(current.date,7,8),sep="")
-
-map.grob <- ggplotGrob(ggplot() +
-  geom_polygon(data=county.map, aes(x=long,y=lat, group=group, fill=filldata), color="black") +
-  coord_map() +
-  scale_fill_distiller(name="New Reg", palette = rev("YlGn"), trans = "reverse", na.value = 'white') +
-  guides(fill = guide_legend(reverse = TRUE, nbin= 5, nrow=5)) +
-  theme_nothing(legend = TRUE)+
-  labs(title=titletxt))
-
 base <- data.frame(x = 1:10 , y = 1:5)
 ggplot(base, aes(x, y)) +
   theme_nothing() +
   annotation_custom(map.grob, xmin=-Inf, xmax=Inf, ymin=2.3, ymax=5) +
   annotation_custom(logo.grob, xmin=1, xmax=3, ymin=1, ymax=2.5) +
   annotation_custom(bar.party.grob, xmin=7, xmax=10, ymin=1.1, ymax=2.4) +
-  annotation_custom(bar.race.grob, xmin=4, xmax=7, ymin=1.1, ymax=2.4) +
-  annotate("text",x=1.85,y=1.45,label="www.electproject.org")
+  annotation_custom(bar.race.grob, xmin=3, xmax=7, ymin=1.1, ymax=2.4) +
+  annotate("text",x=2.1,y=1.5,label="www.electproject.org")
 
 save.image.file <- paste(working.dir,"NC_newreg_",current.date,".jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
@@ -704,39 +704,39 @@ ggsave(save.image.file, device = "jpeg")
 # Experimenting with this still
 #
 
-query1<-sqldf("SELECT birth_age_last, party_cd_last, voter_reg_num_last FROM combinedtemp WHERE ((status_cd is null) and (birth_age_last<100))") 
-query2<-sqldf("SELECT birth_age_last, party_cd_last , COUNT(voter_reg_num_last) AS filldata FROM query1 GROUP BY birth_age_last, party_cd_last") 
+query1<-sqldf("SELECT birth_age, party_cd, voter_reg_num FROM combinedtemp WHERE ((status_cd_last is null) and (birth_age<100))") 
+query2<-sqldf("SELECT birth_age, party_cd , COUNT(voter_reg_num) AS filldata FROM query1 GROUP BY birth_age, party_cd") 
 
-birth_age_last<-rep(min(query2$birth_age_last):max(query2$birth_age_last), each= 4)
-party_cd_last <- c("DEM", "LIB", "REP", "UNA")
-blank.table <- data.frame(cbind(birth_age_last,party_cd_last))
+birth_age<-rep(min(query2$birth_age):max(query2$birth_age), each= 4)
+party_cd <- c("DEM", "LIB", "REP", "UNA")
+blank.table <- data.frame(cbind(birth_age,party_cd))
 
-bartable <- merge(x = query2, y = blank.table, by.x = c("birth_age_last","party_cd_last"), all.y= TRUE)
+bartable <- merge(x = query2, y = blank.table, by.x = c("birth_age","party_cd"), all.y= TRUE)
 
 bartable$filldata[is.na(bartable$filldata)] <- 0
 
-bartable$birth_age_last<-as.factor(bartable$birth_age_last)
+bartable$birth_age<-as.factor(bartable$birth_age)
 
-levels(bartable$birth_age_last)
-levels(bartable$party_cd_last)
+levels(bartable$birth_age)
+levels(bartable$party_cd)
 
-ages<- nlevels(birth_age_last)
-parties <- nlevels(party_cd_last)
+ages<- nlevels(birth_age)
+parties <- nlevels(party_cd)
 
 data = bartable$filldata
-data = matrix(data, ncol = nlevels(bartable$birth_age_last), byrow = FALSE)
+data = matrix(data, ncol = nlevels(bartable$birth_age), byrow = FALSE)
 
-colnames(data)=levels(bartable$birth_age_last)
-rownames(data)=levels(bartable$party_cd_last)
+colnames(data)=levels(bartable$birth_age)
+rownames(data)=levels(bartable$party_cd)
 
 par(mar=c(5.1, 4.1, 4.1, 7.1), xpd=TRUE)
-barplot(data, main = "NC Purged Voter Registrations in Week Ending 8/27", xlab = "Age", ylab ="Purged Reg", col=c("blue","green","red","yellow"), ylim=c(0, 1000), width=2)
+barplot(data, main = "NC New Voter Registrations in Week Ending 9/10", xlab = "Age", ylab ="Purged Reg", col=c("blue","green","red","yellow"), ylim=c(0, 2500), width=2)
 legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
 
-save.image.file <- paste(working.dir,"NC_purged_by_age_",current.date,".png", sep="")
+save.image.file <- paste(working.dir,"NC_newreg_by_age_",current.date,".png", sep="")
 
 png(file = save.image.file)
-barplot(data, main = "NC Purged Voter Registrations in Week Ending 8/27", xlab = "Age", ylab ="Purged Reg", col=c("blue","green","red","yellow"), ylim=c(0, 1000), width=2)
+barplot(data, main = "NC New Voter Registrations in Week Ending 9/10", xlab = "Age", ylab ="Purged Reg", col=c("blue","green","red","yellow"), ylim=c(0, 2500), width=2)
 legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
 dev.off()
 

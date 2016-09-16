@@ -14,6 +14,7 @@ library(ggplot2)
 library(rgeos)
 library(png)
 library(gridGraphics)
+library(plyr)
 
 #########
 # Setup #
@@ -239,4 +240,33 @@ save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abreq_09
 ggsave(save.image.file, device = "jpeg")
 
 
+party_2012_file <- "D:/Research/Turnout/Voter Files/Analyze/NC/2012_requests_party.csv"
+party_2012 <- read.csv(party_2012_file, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE)
 
+party_2012$req_dt <- as.Date(party_2012$ballot_req_dt,format="%m/%d/%Y")
+
+# clean up party first
+
+party_2012 <- ddply(party_2012, .(voter_party_code), transform, Cumulative.Sum = cumsum(Reqs))
+
+temp <- party_2012[party_2012$req_dt>as.Date("2012-09-05") & party_2012$req_dt<as.Date("2012-11-06"),]
+temp
+
+# create blank table to fill in missing dates and party stats
+# (not necessary in this instance, but can't be sure of missing rows in general)
+
+st <- as.Date("2012-09-06")
+en <- as.Date("2012-11-06")
+req_dt <- as.character(rep(seq(st, en, by = "days"), each=4))
+
+party_cd <- c("DEM", "LIB", "REP", "UNA")
+
+blank.table <- data.frame(cbind(req_dt,party_cd))
+
+colnames(blank.table) <- c("req_dt", "voter_party_code")
+blank.table$ballot_req_dt <- as.Date(blank.table$req_dt)
+blank.table
+
+temp <- merge(x = blank.table, y = party_2012, by = c("ballot_req_dt", "voter_party_code"), all.x= TRUE)
+
+temp

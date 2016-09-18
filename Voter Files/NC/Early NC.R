@@ -68,24 +68,76 @@ currentabs <- merge(x = currentabs, y = dup, by = "ncid", all=TRUE, sort=FALSE)
 
 query <- sqldf("SELECT voter_party_code, Count(voter_party_code) AS req FROM currentabs WHERE ((count=1) OR ((count>1) AND ((ballot_send_dt !='') AND ((ballot_rtn_status ='') Or (ballot_rtn_status='ACCEPTED'))))) GROUP BY voter_party_code")
 
-query$voter_party_code <- as.character(query$voter_party_code)
-
-query[1,1] <- "Dem"
-query[2,1] <- "Lib"
-query[3,1] <- "Rep"
-query[4,1] <- "Una"
-
-query
-
 sum(query$req)
 
-bar.party.grob <- ggplotGrob(ggplot(data = query,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
- scale_fill_manual(values=c("darkblue","green","red","yellow")) +
+query$voter_party_code <- as.character(query$voter_party_code)
+
+query[1,1] <- "Dem 2016"
+query[2,1] <- "Lib 2016"
+query[3,1] <- "Rep 2016"
+query[4,1] <- "Una 2016"
+
+# 2012 Relative Counts
+
+party_2012_file <- "D:/Research/Turnout/Voter Files/Analyze/NC/2012_requests_party.csv"
+party_2012 <- read.csv(party_2012_file, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE)
+
+party_2012$req_dt <- as.Date(party_2012$ballot_req_dt,format="%m/%d/%Y")
+
+# Calculate cumulative requests by party
+
+party_2012 <- ddply(party_2012, .(voter_party_code), transform, Cumulative.Sum = cumsum(req))
+
+# Select date rage
+
+party_2012 <- party_2012[party_2012$req_dt>as.Date("2012-09-05") & party_2012$req_dt<as.Date("2012-11-06"),]
+
+# Compute days from election
+
+party_2012$countdown12 <- as.Date("2012-11-06") - party_2012$req_dt
+party_2012
+
+Current.relative.day <- as.Date("2016-11-08") - as.Date(Sys.Date())
+Current.relative.day
+
+abs.2012 <- party_2012[party_2012[,"countdown12"]==Current.relative.day,]
+abs.2012
+
+keepvars <- c("voter_party_code","Cumulative.Sum")
+abs.2012 <- abs.2012[keepvars]
+
+colnames(abs.2012)[2] = "req"
+abs.2012
+
+levels(abs.2012$voter_party_code)[levels(abs.2012$voter_party_code)=="DEM"] <- "Dem 2012"
+levels(abs.2012$voter_party_code)[levels(abs.2012$voter_party_code)=="LIB"] <- "Lib 2012"
+levels(abs.2012$voter_party_code)[levels(abs.2012$voter_party_code)=="REP"] <- "Rep 2012"
+levels(abs.2012$voter_party_code)[levels(abs.2012$voter_party_code)=="UNA"] <- "Una 2012"
+
+combined <- rbind(query,abs.2012)
+combined
+combined$voter_party_code <- as.factor(combined$voter_party_code)
+
+ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
+ scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","pink","red2","khaki","gold3")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
  labs(y = "Ballot Requests", x = "") +
  guides(fill=FALSE) +
- theme_minimal())
+ theme_minimal()+
+ theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=11))
+
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abparty_0914.jpg", sep="")
+ggsave(save.image.file, device = "jpeg")
+
+bar.party.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
+ scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","pink","red2","khaki","gold3")) +
+ scale_y_continuous(labels = scales::comma) +
+ geom_bar(stat="identity") +
+ labs(y = "Ballot Requests", x = "") +
+ guides(fill=FALSE) +
+ theme_minimal()+
+ theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
 
 # Total absentee requests
 
@@ -100,7 +152,7 @@ currentvoters <- currentvoters[keepvars]
 
 currentabs <- merge(x = currentabs, y = currentvoters, by = "ncid", all.x = TRUE, sort=FALSE)
 
-query1 <- sqldf("SELECT county_id, ncid, race_code, ethnic_code, race, gender FROM currentabs WHERE ((count=1) OR ((count>1) AND ((ballot_send_dt !='') AND ((ballot_rtn_status ='') Or (ballot_rtn_status='ACCEPTED')))))")
+query1 <- sqldf("SELECT county_id, ncid, race_code, ethnic_code, voter_party_code, race, gender FROM currentabs WHERE ((count=1) OR ((count>1) AND ((ballot_send_dt !='') AND ((ballot_rtn_status ='') Or (ballot_rtn_status='ACCEPTED')))))")
 query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 GROUP BY county_id")
 
 reqs.T <- sum(query2$reqs)
@@ -175,18 +227,103 @@ bar.gender.grob <- ggplotGrob(ggplot(data = abs.gender,aes(x=gender, y = reqs, f
  guides(fill=FALSE) +
  theme_minimal())
 
+#####################
+# Accepted ballots  #
+#####################
+
+query3 <- sqldf("SELECT voter_party_code, Count(voter_party_code) AS accepted FROM currentabs WHERE ballot_rtn_status='ACCEPTED' GROUP BY voter_party_code")
+
+sum(query3$accepted)
+
+query3$voter_party_code <- as.character(query$voter_party_code)
+
+query3[1,1] <- "Dem 2016"
+query3[2,1] <- "Lib 2016"
+query3[3,1] <- "Rep 2016"
+query3[4,1] <- "Una 2016"
+
+accepted_party_2012_file <- "D:/Research/Turnout/Voter Files/Analyze/NC/2012_accepted_party.csv"
+accepted_party_2012 <- read.csv(accepted_party_2012_file, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE)
+
+accepted_party_2012$rtn_dt <- as.Date(accepted_party_2012$ballot_rtn_dt,format="%m/%d/%Y")
+
+# Fill in missing return dates/party (have to do this for Libertarians)
+
+rtn_dt <- rep(seq(as.Date("2012/09/06"), as.Date("2012/11/08"), by = "day"),  each=4)
+rtn_dt <- as.character(rtn_dt)
+
+voter_party_code <- c("DEM","LIB","REP","UNA")
+blank_table <- as.data.frame(cbind(rtn_dt, voter_party_code))
+colnames(blank_table) <- c("rtn_dt","voter_party_code")
+
+temp <- merge(x = accepted_party_2012, y = blank_table, by = c("rtn_dt","voter_party_code"), all=TRUE)
+temp<-as.data.frame(temp)
+
+temp <- temp[order(temp$voter_party_code, temp$rtn_dt),]
+temp$Accepted[is.na(temp$Accepted)] <- 0
+
+# Calculate cumulative requests by party
+
+accepted_party_2012 <- ddply(temp, .(voter_party_code), transform, Cumulative.Sum = cumsum(Accepted))
+
+# Select date rage
+
+# Compute days from election
+
+accepted_party_2012$countdown12 <- as.Date("2012-11-06") - accepted_party_2012$rtn_dt
+accepted_party_2012
+
+Current.relative.day <- as.Date("2016-11-08") - as.Date(Sys.Date())
+Current.relative.day
+
+accept_2012 <- accepted_party_2012[accepted_party_2012[,"countdown12"]==Current.relative.day,]
+accept_2012
+
+keepvars <- c("voter_party_code","Cumulative.Sum")
+accept_2012 <- accept_2012[keepvars]
+
+colnames(accept_2012)[2] = "accepted"
+accept_2012
+
+levels(accept_2012$voter_party_code)[levels(accept_2012$voter_party_code)=="DEM"] <- "Dem 2012"
+levels(accept_2012$voter_party_code)[levels(accept_2012$voter_party_code)=="LIB"] <- "Lib 2012"
+levels(accept_2012$voter_party_code)[levels(accept_2012$voter_party_code)=="REP"] <- "Rep 2012"
+levels(accept_2012$voter_party_code)[levels(accept_2012$voter_party_code)=="UNA"] <- "Una 2012"
+
+combined <- rbind(query3,accept_2012)
+
+combined$voter_party_code <- as.factor(combined$voter_party_code)
+
+bar.party.accept.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = accepted, fill=voter_party_code)) + 
+ scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","pink","red2","khaki","gold3")) +
+ scale_y_continuous(labels = scales::comma) +
+ geom_bar(stat="identity") +
+ labs(y = "Accepted Ballots", x = "") +
+ guides(fill=FALSE) +
+ theme_minimal()+
+ theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
+
+accepted.label <- paste("Accepted Ballots: ", as.character(sum(query3$accepted)))
+accepted.label
+
+requested.label <- paste("Requested Ballots: ",as.character(sum(reqs.T)))
+requested.label
+
+
 base <- data.frame(x = 1:10 , y = 1:5)
 ggplot(base, aes(x, y)) +
   theme_nothing() +
-  annotation_custom(logo.grob, xmin=1, xmax=3, ymin=1.5, ymax=3) +
-  annotation_custom(bar.party.grob, xmin=5.5, xmax=9.9, ymin=3, ymax=4.5) +
-  annotation_custom(bar.gender.grob, xmin=5.5, xmax=9.9, ymin=1.5, ymax=3) +
-  annotation_custom(bar.race.grob, xmin=.5, xmax=5, ymin=3, ymax=4.5) +
-  annotate("text",x=2.1,y=2,label="www.electproject.org")
+  annotation_custom(logo.grob, xmin=1.1, xmax=3.1, ymin=0.5, ymax=2.5) +
+  annotation_custom(bar.party.accept.grob, xmin=1, xmax=5, ymin=3.2, ymax=4.5) +
+  annotation_custom(bar.party.grob, xmin=5.5, xmax=9.9, ymin=3.2, ymax=4.5) +
+  annotation_custom(bar.gender.grob, xmin=5.5, xmax=9.9, ymin=.7, ymax=2.2) +
+  annotation_custom(bar.race.grob, xmin=5.5, xmax=9.9, ymin=2.1, ymax=3.3) +
+  annotate("text",x=2.2,y=1.25,label="www.electproject.org") +
+  annotate("text",x=3.5,y=4.9,label=accepted.label) +
+  annotate("text",x=8,y=4.9,label=requested.label)
 
-save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abreq_0914.jpg", sep="")
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_0917.jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
-
 
 
 # Cumulative Ballot Requests
@@ -240,33 +377,3 @@ save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abreq_09
 ggsave(save.image.file, device = "jpeg")
 
 
-party_2012_file <- "D:/Research/Turnout/Voter Files/Analyze/NC/2012_requests_party.csv"
-party_2012 <- read.csv(party_2012_file, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE)
-
-party_2012$req_dt <- as.Date(party_2012$ballot_req_dt,format="%m/%d/%Y")
-
-# clean up party first
-
-party_2012 <- ddply(party_2012, .(voter_party_code), transform, Cumulative.Sum = cumsum(Reqs))
-
-temp <- party_2012[party_2012$req_dt>as.Date("2012-09-05") & party_2012$req_dt<as.Date("2012-11-06"),]
-temp
-
-# create blank table to fill in missing dates and party stats
-# (not necessary in this instance, but can't be sure of missing rows in general)
-
-st <- as.Date("2012-09-06")
-en <- as.Date("2012-11-06")
-req_dt <- as.character(rep(seq(st, en, by = "days"), each=4))
-
-party_cd <- c("DEM", "LIB", "REP", "UNA")
-
-blank.table <- data.frame(cbind(req_dt,party_cd))
-
-colnames(blank.table) <- c("req_dt", "voter_party_code")
-blank.table$ballot_req_dt <- as.Date(blank.table$req_dt)
-blank.table
-
-temp <- merge(x = blank.table, y = party_2012, by = c("ballot_req_dt", "voter_party_code"), all.x= TRUE)
-
-temp

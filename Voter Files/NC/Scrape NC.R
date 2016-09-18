@@ -729,14 +729,18 @@ data = matrix(data, ncol = nlevels(bartable$birth_age), byrow = FALSE)
 colnames(data)=levels(bartable$birth_age)
 rownames(data)=levels(bartable$party_cd)
 
+
+age.title <- paste("NC New Voter Registrations for Week Ending ",substr(current.date,5,6),"/",substr(current.date,7,8),sep="")
+age.title
+
 par(mar=c(5.1, 4.1, 4.1, 7.1), xpd=TRUE)
-barplot(data, main = "NC New Voter Registrations in Week Ending 9/10", xlab = "Age", ylab ="Purged Reg", col=c("blue","green","red","yellow"), ylim=c(0, 2500), width=2)
+barplot(data, main = age.title, xlab = "Age", ylab ="New Reg", col=c("blue","green","red","yellow"), ylim=c(0, 2500), width=2)
 legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
 
 save.image.file <- paste(working.dir,"NC_newreg_by_age_",current.date,".png", sep="")
 
 png(file = save.image.file)
-barplot(data, main = "NC New Voter Registrations in Week Ending 9/10", xlab = "Age", ylab ="Purged Reg", col=c("blue","green","red","yellow"), ylim=c(0, 2500), width=2)
+barplot(data, main = age.title, xlab = "Age", ylab ="New Reg", col=c("blue","green","red","yellow"), ylim=c(0, 2500), width=2)
 legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
 dev.off()
 

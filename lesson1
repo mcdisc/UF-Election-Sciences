@@ -1,0 +1,28 @@
+#R operates using working directories. Basically, it lets R know what folder you're working in
+setwd("~/Documents/Data Projects/Lessons")
+
+#now we need to read in the files that we downloaded. the read.csv function should do very well here
+
+VINTON <- read.csv("VINTON.csv")
+VINTON2 <- read.csv("VINTON2.csv")
+View(VINTON)
+#so many variables that are uselsss to what we're doing
+
+#explain libraries in R, open source nature
+library(data.table)
+
+
+#the data.table library makes it really easy to select whatever columns you want to use
+VINTON <- fread("VINTON.csv", select = c("SOS_VOTERID", "DATE_OF_BIRTH", "FIRST_NAME", "LAST_NAME", "RESIDENTIAL_CITY", "GENERAL_11_06_2012"))
+VINTON2 <- fread("VINTON2.csv", select = c("SOS_VOTERID", "DATE_OF_BIRTH", "FIRST_NAME", "LAST_NAME", "RESIDENTIAL_CITY", "GENERAL_11_06_2012"))
+
+#the merge function allows you to make two dataframes into one
+#all handles inner and outer joins
+combo <- merge(VINTON, VINTON2, by = "SOS_VOTERID", all = TRUE)
+
+#
+purged <- combo[is.na(combo$LAST_NAME.y)]
+
+library(ggplot2)
+qplot(purged$RESIDENTIAL_CITY.x)
+qplot(purged$GENERAL_11_06_2012.x)

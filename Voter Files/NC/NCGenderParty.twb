@@ -1,0 +1,1070 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 10000.16.0812.0001                               -->
+<workbook source-build='10.0.0 (10000.16.0812.0001)' source-platform='mac' version='10.0' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='absentee91716 (NC_EARLYVOTE)' inline='true' name='federated.1phi8ne11prwoz1085xn21jsxytl' version='10.0'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='localhost' name='mysql.1m068vz0mlp8ds1c4640g0sc8ms5'>
+            <connection class='mysql' dbname='NC_EARLYVOTE' odbc-native-protocol='yes' port='3306' server='localhost' source-charset='' username='root' />
+          </named-connection>
+        </named-connections>
+        <relation connection='mysql.1m068vz0mlp8ds1c4640g0sc8ms5' name='absentee91716' table='[absentee91716]' type='table' />
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>county_desc</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[county_desc]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>county_desc</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>voter_reg_num</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[voter_reg_num]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>voter_reg_num</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ncid</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ncid]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ncid</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>12</width>
+            <contains-null>true</contains-null>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_VARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+              <attribute datatype='string' name='TypeIsVarchar'>&quot;true&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>voter_last_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[voter_last_name]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>voter_last_name</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>voter_first_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[voter_first_name]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>voter_first_name</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>voter_middle_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[voter_middle_name]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>voter_middle_name</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>race</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[race]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>race</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>gender</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[gender]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>gender</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>age</remote-name>
+            <remote-type>3</remote-type>
+            <local-name>[age]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>age</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>10</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_INTEGER&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_SLONG&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>voter_street_address</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[voter_street_address]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>voter_street_address</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>voter_city</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[voter_city]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>voter_city</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>voter_state</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[voter_state]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>voter_state</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>voter_zip</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[voter_zip]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>voter_zip</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_mail_street_address</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ballot_mail_street_address]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_mail_street_address</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_mail_city</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ballot_mail_city]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_mail_city</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_mail_state</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ballot_mail_state]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_mail_state</remote-alias>
+            <ordinal>16</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_mail_zip</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ballot_mail_zip]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_mail_zip</remote-alias>
+            <ordinal>17</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>other_mail_addr1</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[other_mail_addr1]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>other_mail_addr1</remote-alias>
+            <ordinal>18</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>other_mail_addr2</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[other_mail_addr2]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>other_mail_addr2</remote-alias>
+            <ordinal>19</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>other_city_state_zip</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[other_city_state_zip]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>other_city_state_zip</remote-alias>
+            <ordinal>20</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>election_dt</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[election_dt]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>election_dt</remote-alias>
+            <ordinal>21</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>voter_party_code</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[voter_party_code]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>voter_party_code</remote-alias>
+            <ordinal>22</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>precinct_desc</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[precinct_desc]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>precinct_desc</remote-alias>
+            <ordinal>23</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>cong_dist_desc</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[cong_dist_desc]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>cong_dist_desc</remote-alias>
+            <ordinal>24</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>nc_house_desc</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[nc_house_desc]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>nc_house_desc</remote-alias>
+            <ordinal>25</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>nc_senate_desc</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[nc_senate_desc]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>nc_senate_desc</remote-alias>
+            <ordinal>26</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_req_delivery_type</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ballot_req_delivery_type]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_req_delivery_type</remote-alias>
+            <ordinal>27</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_req_type</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ballot_req_type]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_req_type</remote-alias>
+            <ordinal>28</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_request_party</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ballot_request_party]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_request_party</remote-alias>
+            <ordinal>29</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_req_dt</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[ballot_req_dt]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_req_dt</remote-alias>
+            <ordinal>30</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_TIMESTAMP&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_TIMESTAMP&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_send_dt</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[ballot_send_dt]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_send_dt</remote-alias>
+            <ordinal>31</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_TIMESTAMP&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_TIMESTAMP&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_rtn_dt</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[ballot_rtn_dt]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_rtn_dt</remote-alias>
+            <ordinal>32</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_TYPE_TIMESTAMP&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_TYPE_TIMESTAMP&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ballot_rtn_status</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ballot_rtn_status]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ballot_rtn_status</remote-alias>
+            <ordinal>33</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>site_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[site_name]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>site_name</remote-alias>
+            <ordinal>34</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ethnic_code</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[ethnic_code]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>ethnic_code</remote-alias>
+            <ordinal>35</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>party_cd</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[party_cd]</local-name>
+            <parent-name>[absentee91716]</parent-name>
+            <remote-alias>party_cd</remote-alias>
+            <ordinal>36</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <width>65535</width>
+            <contains-null>true</contains-null>
+            <cast-to-local-type>true</cast-to-local-type>
+            <collation charset='280' flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;SQL_LONGVARCHAR&quot;</attribute>
+              <attribute datatype='string' name='DebugWireType'>&quot;SQL_C_CHAR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column datatype='integer' name='[Number of Records]' role='measure' type='quantitative' user:auto-column='numrec'>
+        <calculation class='tableau' formula='1' />
+      </column>
+      <column caption='Age' datatype='integer' name='[age]' role='measure' type='quantitative' />
+      <column caption='Ballot Mail City' datatype='string' name='[ballot_mail_city]' role='dimension' semantic-role='[City].[Name]' type='nominal' />
+      <column caption='Ballot Mail State' datatype='string' name='[ballot_mail_state]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+      <column caption='Ballot Mail Street Address' datatype='string' name='[ballot_mail_street_address]' role='dimension' type='nominal' />
+      <column caption='Ballot Mail Zip' datatype='string' name='[ballot_mail_zip]' role='dimension' semantic-role='[ZipCode].[Name]' type='nominal' />
+      <column caption='Ballot Req Delivery Type' datatype='string' name='[ballot_req_delivery_type]' role='dimension' type='nominal' />
+      <column caption='Ballot Req Dt' datatype='datetime' name='[ballot_req_dt]' role='dimension' type='ordinal' />
+      <column caption='Ballot Req Type' datatype='string' name='[ballot_req_type]' role='dimension' type='nominal' />
+      <column caption='Ballot Request Party' datatype='string' name='[ballot_request_party]' role='dimension' type='nominal' />
+      <column caption='Ballot Rtn Dt' datatype='datetime' name='[ballot_rtn_dt]' role='dimension' type='ordinal' />
+      <column caption='Ballot Rtn Status' datatype='string' name='[ballot_rtn_status]' role='dimension' type='nominal' />
+      <column caption='Ballot Send Dt' datatype='datetime' name='[ballot_send_dt]' role='dimension' type='ordinal' />
+      <column caption='Cong Dist Desc' datatype='string' name='[cong_dist_desc]' role='dimension' type='nominal' />
+      <column caption='County Desc' datatype='string' name='[county_desc]' role='dimension' semantic-role='[County].[Name]' type='nominal' />
+      <column caption='Election Dt' datatype='string' name='[election_dt]' role='dimension' type='nominal' />
+      <column caption='Ethnic Code' datatype='string' name='[ethnic_code]' role='dimension' type='nominal' />
+      <column caption='Gender' datatype='string' name='[gender]' role='dimension' type='nominal' />
+      <column caption='Nc House Desc' datatype='string' name='[nc_house_desc]' role='dimension' type='nominal' />
+      <column caption='Nc Senate Desc' datatype='string' name='[nc_senate_desc]' role='dimension' type='nominal' />
+      <column caption='Ncid' datatype='string' name='[ncid]' role='dimension' type='nominal' />
+      <column caption='Other City State Zip' datatype='string' name='[other_city_state_zip]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+      <column caption='Other Mail Addr1' datatype='string' name='[other_mail_addr1]' role='dimension' type='nominal' />
+      <column caption='Other Mail Addr2' datatype='string' name='[other_mail_addr2]' role='dimension' type='nominal' />
+      <column caption='Party Cd' datatype='string' name='[party_cd]' role='dimension' type='nominal' />
+      <column caption='Precinct Desc' datatype='string' name='[precinct_desc]' role='dimension' type='nominal' />
+      <column caption='Race' datatype='string' name='[race]' role='dimension' type='nominal' />
+      <column caption='Site Name' datatype='string' name='[site_name]' role='dimension' type='nominal' />
+      <column caption='Voter City' datatype='string' name='[voter_city]' role='dimension' semantic-role='[City].[Name]' type='nominal' />
+      <column caption='Voter First Name' datatype='string' name='[voter_first_name]' role='dimension' type='nominal' />
+      <column caption='Voter Last Name' datatype='string' name='[voter_last_name]' role='dimension' type='nominal' />
+      <column caption='Voter Middle Name' datatype='string' name='[voter_middle_name]' role='dimension' type='nominal' />
+      <column caption='Voter Party Code' datatype='string' name='[voter_party_code]' role='dimension' type='nominal' />
+      <column caption='Voter Reg Num' datatype='string' name='[voter_reg_num]' role='dimension' type='nominal' />
+      <column caption='Voter State' datatype='string' name='[voter_state]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+      <column caption='Voter Street Address' datatype='string' name='[voter_street_address]' role='dimension' type='nominal' />
+      <column caption='Voter Zip' datatype='string' name='[voter_zip]' role='dimension' semantic-role='[ZipCode].[Name]' type='nominal' />
+      <column-instance column='[ballot_request_party]' derivation='None' name='[none:ballot_request_party:nk]' pivot='key' type='nominal' />
+      <column-instance column='[ballot_rtn_dt]' derivation='Year' name='[yr:ballot_rtn_dt:ok]' pivot='key' type='ordinal' />
+      <group hidden='true' name='[Exclusions (Ballot Request Party,YEAR(Ballot Rtn Dt))]' name-style='unqualified' user:auto-column='exclude'>
+        <groupfilter function='crossjoin'>
+          <groupfilter function='level-members' level='[none:ballot_request_party:nk]' />
+          <groupfilter function='level-members' level='[yr:ballot_rtn_dt:ok]' />
+        </groupfilter>
+      </group>
+      <layout dim-ordering='alphabetic' dim-percentage='0.837713' measure-ordering='alphabetic' measure-percentage='0.162287' show-structure='true' />
+      <style>
+        <style-rule element='mark'>
+          <encoding attr='color' field='[yr:ballot_rtn_dt:ok]' type='palette'>
+            <map to='#4e79a7'>
+              <bucket>%null%</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>2016</bucket>
+            </map>
+          </encoding>
+        </style-rule>
+      </style>
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Sheet 1'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Requested Ballots by Party and Gender</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='absentee91716 (NC_EARLYVOTE)' name='federated.1phi8ne11prwoz1085xn21jsxytl' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1phi8ne11prwoz1085xn21jsxytl'>
+            <column caption='Ballot Request Party' datatype='string' name='[ballot_request_party]' role='dimension' type='nominal' />
+            <column-instance column='[ncid]' derivation='CountD' name='[ctd:ncid:qk]' pivot='key' type='quantitative' />
+            <column caption='Gender' datatype='string' name='[gender]' role='dimension' type='nominal' />
+            <column caption='Ncid' datatype='string' name='[ncid]' role='dimension' type='nominal' />
+            <column-instance column='[ballot_request_party]' derivation='None' name='[none:ballot_request_party:nk]' pivot='key' type='nominal' />
+            <column-instance column='[gender]' derivation='None' name='[none:gender:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <format attr='title' class='0' field='[federated.1phi8ne11prwoz1085xn21jsxytl].[ctd:ncid:qk]' scope='rows' value='Number of Records' />
+            <format attr='subtitle' class='0' field='[federated.1phi8ne11prwoz1085xn21jsxytl].[ctd:ncid:qk]' scope='rows' value='' />
+            <format attr='auto-subtitle' class='0' field='[federated.1phi8ne11prwoz1085xn21jsxytl].[ctd:ncid:qk]' scope='rows' value='true' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.1phi8ne11prwoz1085xn21jsxytl].[none:gender:nk]' />
+              <text column='[federated.1phi8ne11prwoz1085xn21jsxytl].[none:gender:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='mark-labels-mode' value='all' />
+                <format attr='mark-labels-show' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1phi8ne11prwoz1085xn21jsxytl].[ctd:ncid:qk]</rows>
+        <cols>[federated.1phi8ne11prwoz1085xn21jsxytl].[none:ballot_request_party:nk]</cols>
+      </table>
+    </worksheet>
+  </worksheets>
+  <windows source-height='30'>
+    <window class='worksheet' maximized='true' name='Sheet 1'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='8'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.1phi8ne11prwoz1085xn21jsxytl].[none:gender:nk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.1phi8ne11prwoz1085xn21jsxytl].[none:ballot_request_party:nk]</field>
+            <field>[federated.1phi8ne11prwoz1085xn21jsxytl].[none:gender:nk]</field>
+            <field>[federated.1phi8ne11prwoz1085xn21jsxytl].[none:ncid:nk]</field>
+            <field>[federated.1phi8ne11prwoz1085xn21jsxytl].[none:party_cd:nk]</field>
+            <field>[federated.1phi8ne11prwoz1085xn21jsxytl].[yr:ballot_req_dt:ok]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='384' name='Sheet 1' width='384'>
+      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
+    </thumbnail>
+  </thumbnails>
+</workbook>

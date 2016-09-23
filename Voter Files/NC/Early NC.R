@@ -77,6 +77,13 @@ query[2,1] <- "Lib 2016"
 query[3,1] <- "Rep 2016"
 query[4,1] <- "Una 2016"
 
+currentstat<-data.frame()
+
+currentstat[1,1] <- query[1,2] 
+currentstat[1,2] <- query[3,2]
+currentstat[1,3] <- query[2,2]
+currentstat[1,4] <- query[4,2]
+
 # 2012 Relative Counts
 
 party_2012_file <- "D:/Research/Turnout/Voter Files/Analyze/NC/2012_requests_party.csv"
@@ -127,9 +134,6 @@ ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) 
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=11))
 
-save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abparty_0914.jpg", sep="")
-ggsave(save.image.file, device = "jpeg")
-
 bar.party.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
  scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","pink","red2","khaki","gold3")) +
  scale_y_continuous(labels = scales::comma) +
@@ -139,20 +143,26 @@ bar.party.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = 
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
 
+
 # Total absentee requests
+# Read in voter file to do race analysis (this step requires scraping the file first by running Scrape NC.R)
+# This is a large file that can overwhelm some computers
 
 current.voter.file <- paste(working.dir,"ncvoter_Statewide.txt", sep="")
 
 readcolumns = c(NA, "NULL", NA, NA, NA, NA, "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", NA, NA, NA, NA, "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", NA, NA, NA, NA, NA)
 currentvoters <- read.csv(current.voter.file, header = TRUE, sep = "\t", quote = "\"", dec = ".", fill = TRUE, colClasses = readcolumns)
 
-keepvars <- c("status_cd","ethnic_code","race_code","ncid","county_id")
+keepvars <- c("status_cd","ethnic_code","race_code","ncid","county_id","birth_state")
 
 currentvoters <- currentvoters[keepvars]
 
 currentabs <- merge(x = currentabs, y = currentvoters, by = "ncid", all.x = TRUE, sort=FALSE)
 
-query1 <- sqldf("SELECT county_id, ncid, race_code, ethnic_code, voter_party_code, race, gender FROM currentabs WHERE ((count=1) OR ((count>1) AND ((ballot_send_dt !='') AND ((ballot_rtn_status ='') Or (ballot_rtn_status='ACCEPTED')))))")
+currentabs$NC[currentabs$birth_state == "NC"] <- "NC"
+currentabs$NC[currentabs$birth_state != "NC"] <- "Elsewhere"
+
+query1 <- sqldf("SELECT county_id, age, ncid, race, race_code, ethnic_code, voter_party_code, gender, NC FROM currentabs WHERE ((count=1) OR ((count>1) AND ((ballot_send_dt !='') AND ((ballot_rtn_status ='') Or (ballot_rtn_status='ACCEPTED')))))")
 query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 GROUP BY county_id")
 
 reqs.T <- sum(query2$reqs)
@@ -160,26 +170,27 @@ reqs.T
 
 # Race Analysis 
 #
-# Read in voter file to do race analysis (this step requires scraping the file first by running Scrape NC.R)
-# This is a large file that can overwhelm some computers
-
-# NH Black
-
-query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE ((race_code='B') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
-
-reqs.B <- sum(query2$reqs)
-reqs.B
-
 # NH White
 
-query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE ((race_code='W') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE ((race='WHITE') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
 
 reqs.W <- sum(query2$reqs)
 reqs.W
 
+currentstat[1,5] <- sum(query2$reqs)
+
+# NH Black
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE ((race='BLACK or AFRICAN AMERICAN') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
+
+reqs.B <- sum(query2$reqs)
+reqs.B
+
+currentstat[1,6] <- sum(query2$reqs)
+
 # NH Asian
 
-query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE ((race_code='A') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE ((race='ASIAN') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
 
 reqs.A <- sum(query2$reqs)
 reqs.A
@@ -191,12 +202,28 @@ query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (ethnic
 reqs.H <- sum(query2$reqs)
 reqs.H
 
+currentstat[1,7] <- sum(query2$reqs)
+
+# Unknown (for Associated Press)
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE ((race='UNDESIGNATED') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
+
+reqs.U <- sum(query2$reqs)
+
+# Other
+
 reqs.O <- reqs.T - reqs.B - reqs.W - reqs.A - reqs.H
+
+# Other (for Associated Press)
+
+currentstat[1,8] <- reqs.T - reqs.W - reqs.B - reqs.H - reqs.U
+currentstat[1,9] <- reqs.U
+currentstat
 
 abs.race <- data.frame(race=c("Black","White","Asian","Hisp","Oth"),reqs = c(reqs.B, reqs.W, reqs.A, reqs.H, reqs.O))
 
 bar.race.grob <- ggplotGrob(ggplot(data = abs.race,aes(x=race, y = reqs, fill=race)) + 
- scale_fill_manual(values=c("thistle1","grey20","gold","coral3","snow2")) +
+ scale_fill_manual(values=c("thistle1","grey20","gold","coral3","antiquewhite1")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
  labs(y = "Ballot Requests", x = "") +
@@ -210,13 +237,19 @@ bar.race.grob <- ggplotGrob(ggplot(data = abs.race,aes(x=race, y = reqs, fill=ra
 query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (gender='F') GROUP BY county_id")
 reqs.Women <- sum(query2$reqs)
 
+currentstat[1,10] <- reqs.Women
+
 # Men
 
 query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (gender='M') GROUP BY county_id")
 reqs.Men <- sum(query2$reqs)
 
+currentstat[1,11] <- reqs.Men
+
 reqs.Unk <- reqs.T - reqs.Women - reqs.Men
 
+currentstat[1,12] <- reqs.Unk
+currentstat
 abs.gender <- data.frame(gender=c("Women","Men","Unk"),reqs = c(reqs.Women, reqs.Men, reqs.Unk))
 
 bar.gender.grob <- ggplotGrob(ggplot(data = abs.gender,aes(x=gender, y = reqs, fill=gender)) + 
@@ -226,6 +259,43 @@ bar.gender.grob <- ggplotGrob(ggplot(data = abs.gender,aes(x=gender, y = reqs, f
  labs(y = "Ballot Requests", x = "") +
  guides(fill=FALSE) +
  theme_minimal())
+
+# Age
+
+query2 <- sqldf("SELECT age, Count(age) AS requests FROM query1 GROUP BY age")
+
+query2$age<-as.numeric(query2$age)
+
+bar.age.grob <- ggplotGrob(ggplot(query2, aes(x=age, y= requests, width=1)) + 
+  geom_bar(stat="identity", fill="brown4")+
+  theme_minimal()+
+  labs(y = "Ballot Requests", x = "Age")+
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks=c(25,50,75,100)) +
+  theme(axis.title.x = element_text(size=10)))
+
+# Age 4 categories (for Associated Press)
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (age<30) GROUP BY county_id")
+reqs.age1829 <- sum(query2$reqs)
+
+currentstat[1,13] <- reqs.age1829
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (age>29 AND age<45) GROUP BY county_id")
+reqs.age3044 <- sum(query2$reqs)
+
+currentstat[1,14] <- reqs.age3044
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (age>44 AND age<60) GROUP BY county_id")
+reqs.age4459 <- sum(query2$reqs)
+
+currentstat[1,15] <- reqs.age4459
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (age>59) GROUP BY county_id")
+reqs.age60plus <- sum(query2$reqs)
+
+currentstat[1,16] <- reqs.age60plus
+currentstat
 
 #####################
 # Accepted ballots  #
@@ -241,6 +311,12 @@ query3[1,1] <- "Dem 2016"
 query3[2,1] <- "Lib 2016"
 query3[3,1] <- "Rep 2016"
 query3[4,1] <- "Una 2016"
+
+currentstat[2,1] <- query3[1,2] 
+currentstat[2,2] <- query3[3,2]
+currentstat[2,3] <- query3[2,2]
+currentstat[2,4] <- query3[4,2]
+currentstat
 
 accepted_party_2012_file <- "D:/Research/Turnout/Voter Files/Analyze/NC/2012_accepted_party.csv"
 accepted_party_2012 <- read.csv(accepted_party_2012_file, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE)
@@ -294,6 +370,8 @@ combined <- rbind(query3,accept_2012)
 
 combined$voter_party_code <- as.factor(combined$voter_party_code)
 
+combined
+
 bar.party.accept.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = accepted, fill=voter_party_code)) + 
  scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","pink","red2","khaki","gold3")) +
  scale_y_continuous(labels = scales::comma) +
@@ -303,28 +381,180 @@ bar.party.accept.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_cod
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
 
-accepted.label <- paste("Accepted Ballots: ", as.character(sum(query3$accepted)))
+# Demographics
+
+query1 <- sqldf("SELECT county_id, ncid, age, race_code, ethnic_code, voter_party_code, race, gender FROM currentabs WHERE ballot_rtn_status='ACCEPTED'")
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS acc FROM query1 GROUP BY county_id")
+
+acc.T <- sum(query2$acc)
+acc.T
+
+# Race Analysis 
+#
+# Read in voter file to do race analysis (this step requires scraping the file first by running Scrape NC.R)
+# This is a large file that can overwhelm some computers
+
+# NH White
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS acc FROM query1 WHERE ((race_code='W') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
+
+acc.W <- sum(query2$acc)
+acc.W
+
+currentstat[2,5] <- sum(query2$acc)
+
+# NH Black
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS acc FROM query1 WHERE ((race_code='B') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
+
+acc.B <- sum(query2$acc)
+acc.B
+
+currentstat[2,6] <- sum(query2$acc)
+
+# NH Asian
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS acc FROM query1 WHERE ((race_code='A') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
+
+acc.A <- sum(query2$acc)
+acc.A
+
+# Hispanics
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS acc FROM query1 WHERE (ethnic_code='HL') GROUP BY county_id")
+
+acc.H <- sum(query2$acc)
+acc.H
+
+currentstat[2,7] <- sum(query2$acc)
+
+# Unknown (for Associated Press)
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS acc FROM query1 WHERE ((race='UNDESIGNATED') AND (ethnic_code='NL' OR ethnic_code='UN')) GROUP BY county_id")
+
+acc.U <- sum(query2$acc)
+
+acc.O <- acc.T - acc.B - acc.W - acc.A - acc.H
+
+# Other (for Associated Press)
+
+currentstat[2,8] <- acc.T - acc.W - acc.B - acc.H - acc.U
+currentstat[2,9] <- acc.U
+currentstat
+
+abs.acc.race <- data.frame(race=c("Black","White","Asian","Hisp","Oth"),acc = c(acc.B, acc.W, acc.A, acc.H, acc.O))
+
+bar.race.accept.grob <- ggplotGrob(ggplot(data = abs.acc.race,aes(x=race, y = acc, fill=race)) + 
+ scale_fill_manual(values=c("thistle1","grey20","gold","coral3","antiquewhite1")) +
+ scale_y_continuous(labels = scales::comma) +
+ geom_bar(stat="identity") +
+ labs(y = "Accepted Ballots", x = "") +
+ guides(fill=FALSE) +
+ theme_minimal())
+
+# Gender
+
+# Women
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS acc FROM query1 WHERE (gender='F') GROUP BY county_id")
+acc.Women <- sum(query2$acc)
+
+currentstat[2,10] <- acc.Women
+
+# Men
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS acc FROM query1 WHERE (gender='M') GROUP BY county_id")
+acc.Men <- sum(query2$acc)
+
+currentstat[2,11] <- acc.Men
+
+acc.Unk <- acc.T - acc.Women - acc.Men
+
+currentstat[2,12] <- acc.Unk
+currentstat
+
+abs.acc.gender <- data.frame(gender=c("Women","Men","Unk"),acc = c(acc.Women, acc.Men, acc.Unk))
+
+bar.gender.accept.grob <- ggplotGrob(ggplot(data = abs.acc.gender,aes(x=gender, y = acc, fill=gender)) + 
+ scale_fill_manual(values=c("darkolivegreen","gray","coral")) +
+ scale_y_continuous(labels = scales::comma) +
+ geom_bar(stat="identity") +
+ labs(y = "Acceptd Ballots", x = "") +
+ guides(fill=FALSE) +
+ theme_minimal())
+
+# Age
+
+query3 <- sqldf("SELECT age, Count(age) AS accepted FROM currentabs WHERE ballot_rtn_status='ACCEPTED' GROUP BY age")
+query3
+
+query3$age<-as.numeric(query3$age)
+
+# Age 4 categories (for Associated Press)
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (age<30) GROUP BY county_id")
+reqs.age1829 <- sum(query2$reqs)
+
+currentstat[2,13] <- reqs.age1829
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (age>29 AND age<45) GROUP BY county_id")
+reqs.age3044 <- sum(query2$reqs)
+
+currentstat[2,14] <- reqs.age3044
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (age>44 AND age<60) GROUP BY county_id")
+reqs.age4459 <- sum(query2$reqs)
+
+currentstat[2,15] <- reqs.age4459
+
+query2 <- sqldf("SELECT county_id, COUNT(ncid) AS reqs FROM query1 WHERE (age>59) GROUP BY county_id")
+reqs.age60plus <- sum(query2$reqs)
+
+currentstat[2,16] <- reqs.age60plus
+
+bar.age.accept.grob <- ggplotGrob(ggplot(query3, aes(x=age, y= accepted, width=1)) + 
+  geom_bar(stat="identity", fill="brown4")+
+  theme_minimal()+
+  scale_y_continuous(labels = scales::comma) +
+  labs(y = "Accepted Ballots", x = "Age")+
+  scale_x_continuous(breaks=c(25,50,75,100)) +
+  theme(axis.title.x = element_text(size=10)))
+
+#####################
+# Combine All Plots #
+#####################
+
+accepted.label <- paste("Accepted Ballots: ", formatC(sum(query3$accepted), format = "d", big.mark=','))
 accepted.label
 
-requested.label <- paste("Requested Ballots: ",as.character(sum(reqs.T)))
+requested.label <- paste("Requested Ballots: ",as.character(formatC(sum(reqs.T), format = "d", big.mark=',')))
 requested.label
 
+requested.label
 
 base <- data.frame(x = 1:10 , y = 1:5)
 ggplot(base, aes(x, y)) +
   theme_nothing() +
-  annotation_custom(logo.grob, xmin=1.1, xmax=3.1, ymin=0.5, ymax=2.5) +
-  annotation_custom(bar.party.accept.grob, xmin=1, xmax=5, ymin=3.2, ymax=4.5) +
-  annotation_custom(bar.party.grob, xmin=5.5, xmax=9.9, ymin=3.2, ymax=4.5) +
-  annotation_custom(bar.gender.grob, xmin=5.5, xmax=9.9, ymin=.7, ymax=2.2) +
-  annotation_custom(bar.race.grob, xmin=5.5, xmax=9.9, ymin=2.1, ymax=3.3) +
-  annotate("text",x=2.2,y=1.25,label="www.electproject.org") +
-  annotate("text",x=3.5,y=4.9,label=accepted.label) +
-  annotate("text",x=8,y=4.9,label=requested.label)
+  annotation_custom(logo.grob, xmin=.5, xmax=2, ymin=0, ymax=.6) +
+  annotate("text",x=1.3,y=.1,label="www.electproject.org", size=2.5) +
+  annotation_custom(bar.party.accept.grob, xmin=1.2, xmax=5.3, ymin=3.4, ymax=4.9) +
+  annotation_custom(bar.party.grob, xmin=5.5, xmax=9.9, ymin=3.4, ymax=4.9) +
+  annotation_custom(bar.race.accept.grob, xmin=1.2, xmax=5.3, ymin=2.4, ymax=3.65) +
+  annotation_custom(bar.race.grob, xmin=5.5, xmax=9.9, ymin=2.4, ymax=3.65) +
+  annotation_custom(bar.age.accept.grob, xmin=1.2, xmax=5.3, ymin=1.1, ymax=2.6) +
+  annotation_custom(bar.age.grob, xmin=5.5, xmax=9.9, ymin=1.1, ymax=2.6) +
+  annotation_custom(bar.gender.accept.grob, xmin=1.2, xmax=5.3, ymin=0, ymax=1.2) +
+  annotation_custom(bar.gender.grob, xmin=5.5, xmax=9.9, ymin=0, ymax=1.2) +
+  annotate("text",x=3.5,y=5,label=accepted.label) +
+  annotate("text",x=8,y=5,label=requested.label)
 
-save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_0917.jpg", sep="")
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_0921.jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
 
+reqs.T
+
+currentstat
+write.table(currentstat, "D:/Research/Turnout/Voter Files/Analyze/NC/current_stats.csv", sep = ",", quote = TRUE, dec = ".", col.names = TRUE, row.names = FALSE)
 
 # Cumulative Ballot Requests
 #
@@ -375,5 +605,6 @@ ggplot(abs_12_16, aes(x = ballot_req_dt.x, y = cum_reqs_2012)) +
 
 save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abreq_0913.jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
+
 
 

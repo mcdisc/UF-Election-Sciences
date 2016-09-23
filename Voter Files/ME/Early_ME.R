@@ -46,13 +46,12 @@ current.file <- paste(working.dir,"absentee-voter-file91516.txt", sep="")
 currentabs <- read.csv(current.file, header = TRUE, sep = "|", quote = "\"", dec = ".", fill = TRUE, stringsAsFactors = FALSE)
 names(currentabs)[names(currentabs)=="ACC.OR.REJ"]<-"ACCORREJ"
 
-
 # 2012 Absentee File (Only need to run the download part once
-
-url <- "http://www.maine.gov/sos/cec/elec/data/2012novemberabsentee.txt"
-destfile <- "D:/Research/Turnout/Voter Files/Analyze/ME/2012novemberabsentee.txt"
-
-download.file(url, destfile, mode = "wb")
+#
+# url <- "http://www.maine.gov/sos/cec/elec/data/2012novemberabsentee.txt"
+# destfile <- "D:/Research/Turnout/Voter Files/Analyze/ME/2012novemberabsentee.txt"
+#
+# download.file(url, destfile, mode = "wb")
 
 last.file <- paste(working.dir,"2012novemberabsentee.txt", sep="")
 
@@ -66,49 +65,202 @@ reldate <- as.Date("9/14/2012", format="%m/%d/%Y")
 
 temp <- lastabs[which(lastabs$reqdt<reldate),]
 
-querylast_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM temp WHERE (DUP Is Null and ACCORREJ <>'REJ') GROUP BY P")
+# Statewide
+
+querylast_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM temp WHERE (DUP Is Null AND P <>'A') GROUP BY P")
 
 # WARNING! Had to hardwire in no Libertarian Party in 2012
 
 querylast_p
 
-querylast_p[6,]<-querylast_p[5,]
 querylast_p[5,]<-querylast_p[4,]
-querylast_p[4,2]<-0
+querylast_p[4,]<-querylast_p[3,]
+querylast_p[3,2]<-0
 
-querylast_p[1,1] <- "Oth 2012"
-querylast_p[2,1] <- "Dem 2012"
-querylast_p[3,1] <- "Grn 2012"
-querylast_p[4,1] <- "Lib 2012"
-querylast_p[5,1] <- "Rep 2012"
-querylast_p[6,1] <- "Una 2012"
+querylast_p[1,1] <- "Dem 2012"
+querylast_p[2,1] <- "Grn 2012"
+querylast_p[3,1] <- "Lib 2012"
+querylast_p[4,1] <- "Rep 2012"
+querylast_p[5,1] <- "Una 2012"
 
 querylast_p
 
-querycurrent_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM currentabs WHERE (DUP Is Null and ACCORREJ <>'REJ') GROUP BY P")
+querycurrent_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM currentabs WHERE (DUP Is Null AND P<>'') GROUP BY P")
 querycurrent_p
 
-querycurrent_p[1,1] <- "Oth 2016"
-querycurrent_p[2,1] <- "Dem 2016"
-querycurrent_p[3,1] <- "Grn 2016"
-querycurrent_p[4,1] <- "Lib 2016"
-querycurrent_p[5,1] <- "Rep 2016"
-querycurrent_p[6,1] <- "Una 2016"
+sum(querycurrent_p$req)
+
+querycurrent_p[1,1] <- "Dem 2016"
+querycurrent_p[2,1] <- "Grn 2016"
+querycurrent_p[3,1] <- "Lib 2016"
+querycurrent_p[4,1] <- "Rep 2016"
+querycurrent_p[5,1] <- "Una 2016"
+
+currentstat<-data.frame()
+
+currentstat[1,1] <- querycurrent_p[1,2] 
+currentstat[1,2] <- querycurrent_p[4,2]
+currentstat[1,3] <- querycurrent_p[2,2] + querycurrent_p[3,2]
+currentstat[1,4] <- querycurrent_p[5,2]
 
 combined <- rbind(querycurrent_p, querylast_p)
-
+combined
 combined$voter_party_code <- as.factor(combined$P)
 
 ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
- scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","mediumorchid1","mediumorchid4","gray60","gray8","pink","red2","khaki","gold3")) +
+ scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","mediumorchid1","mediumorchid4","pink","red2","khaki","gold3")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
- labs(y = "Requested Ballots", x = "", title ="Maine Requested Ballots as of 9/15") +
+ labs(y = "Requested Ballots", x = "", title ="Maine Statewide Ballot Requests as of 9/15") +
  guides(fill=FALSE) +
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8))
 
+bar.party.all.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
+ scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","mediumorchid1","mediumorchid4","pink","red2","khaki","gold3")) +
+ scale_y_continuous(labels = scales::comma) +
+ geom_bar(stat="identity") +
+ labs(y = "Requested Ballots", x = "", title ="Maine Statewide Ballot Requests as of 9/15") +
+ guides(fill=FALSE) +
+ theme_minimal()+
+ theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
+
+# CD 1
+
+querylast_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM temp WHERE (DUP Is Null AND CG = 1 AND P <>'A') GROUP BY P")
+
+# WARNING! Had to hardwire in no Libertarian Party in 2012
+
+querylast_p
+
+querylast_p[5,]<-querylast_p[4,]
+querylast_p[4,]<-querylast_p[3,]
+querylast_p[3,2]<-0
+
+querylast_p[1,1] <- "Dem 2012"
+querylast_p[2,1] <- "Grn 2012"
+querylast_p[3,1] <- "Lib 2012"
+querylast_p[4,1] <- "Rep 2012"
+querylast_p[5,1] <- "Una 2012"
+
+querylast_p
+
+querycurrent_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM currentabs WHERE (DUP Is Null AND P<>'' AND CG=1) GROUP BY P")
+querycurrent_p
+
+sum(querycurrent_p$req)
+
+querycurrent_p[1,1] <- "Dem 2016"
+querycurrent_p[2,1] <- "Grn 2016"
+querycurrent_p[3,1] <- "Lib 2016"
+querycurrent_p[4,1] <- "Rep 2016"
+querycurrent_p[5,1] <- "Una 2016"
+
+currentstat[2,1] <- querycurrent_p[1,2] 
+currentstat[2,2] <- querycurrent_p[4,2]
+currentstat[2,3] <- querycurrent_p[2,2] + querycurrent_p[3,2]
+currentstat[2,4] <- querycurrent_p[5,2]
+
+combined <- rbind(querycurrent_p, querylast_p)
+
+combined$voter_party_code <- as.factor(combined$P)
+combined
+
+bar.party.cd1.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
+ scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","mediumorchid1","mediumorchid4","pink","red2","khaki","gold3")) +
+ scale_y_continuous(labels = scales::comma) +
+ geom_bar(stat="identity") +
+ labs(y = "Requested Ballots", x = "", title ="Maine CD1 Ballot Requests as of 9/15") +
+ guides(fill=FALSE) +
+ theme_minimal()+
+ theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
+
+# CD 2
+
+querylast_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM temp WHERE (DUP Is Null AND CG = 2 AND P <>'A') GROUP BY P")
+
+# WARNING! Had to hardwire in no Libertarian Party in 2012
+
+querylast_p
+
+querylast_p[5,]<-querylast_p[4,]
+querylast_p[4,]<-querylast_p[3,]
+querylast_p[3,2]<-0
+
+querylast_p[1,1] <- "Dem 2012"
+querylast_p[2,1] <- "Grn 2012"
+querylast_p[3,1] <- "Lib 2012"
+querylast_p[4,1] <- "Rep 2012"
+querylast_p[5,1] <- "Una 2012"
+
+querylast_p
+
+querycurrent_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM currentabs WHERE (DUP Is Null AND P<>'' AND CG=2) GROUP BY P")
+querycurrent_p
+
+sum(querycurrent_p$req)
+
+querycurrent_p[1,1] <- "Dem 2016"
+querycurrent_p[2,1] <- "Grn 2016"
+querycurrent_p[3,1] <- "Lib 2016"
+querycurrent_p[4,1] <- "Rep 2016"
+querycurrent_p[5,1] <- "Una 2016"
+
+currentstat[3,1] <- querycurrent_p[1,2] 
+currentstat[3,2] <- querycurrent_p[4,2]
+currentstat[3,3] <- querycurrent_p[2,2] + querycurrent_p[3,2]
+currentstat[3,4] <- querycurrent_p[5,2]
+
+currentstat
+
+combined <- rbind(querycurrent_p, querylast_p)
+combined
+combined$voter_party_code <- as.factor(combined$P)
+
+bar.party.cd2.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
+ scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","mediumorchid1","mediumorchid4","pink","red2","khaki","gold3")) +
+ scale_y_continuous(labels = scales::comma) +
+ geom_bar(stat="identity") +
+ labs(y = "Requested Ballots", x = "", title ="Maine CD2 Ballot Requests as of 9/15") +
+ guides(fill=FALSE) +
+ theme_minimal()+
+ theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
+
+# Accepted Ballots
+
+# Statewide
+
+querycurrent_p_a <- sqldf("SELECT P, Count('VOTER ID') AS acc FROM currentabs WHERE (ACCORREJ = 'ACC') GROUP BY P")
+querycurrent_p_a
+
+# CD 1
+
+querycurrent_p_a <- sqldf("SELECT P, Count('VOTER ID') AS acc FROM currentabs WHERE (ACCORREJ = 'ACC' AND CG=1) GROUP BY P")
+querycurrent_p_a
+
+# CD 2
+
+querycurrent_p_a <- sqldf("SELECT P, Count('VOTER ID') AS acc FROM currentabs WHERE (ACCORREJ = 'ACC' AND CG=2) GROUP BY P")
+querycurrent_p_a
+
+
+
+#################
+# Combine Plots #
+#################
+
+base <- data.frame(x = 1:10 , y = 1:5)
+ggplot(base, aes(x, y)) +
+  theme_nothing() +
+  annotation_custom(logo.grob, xmin=.5, xmax=3.1, ymin=0.5, ymax=2.5) +
+  annotation_custom(bar.party.all.grob, xmin=3, xmax=8.5, ymin=3.6, ymax=5) +
+  annotation_custom(bar.party.cd1.grob, xmin=3, xmax=8.5, ymin=2.1, ymax=3.6) +
+  annotation_custom(bar.party.cd2.grob, xmin=3, xmax=8.5, ymin=.7, ymax=2.1) +
+  annotate("text",x=1.7,y=1.25,label="www.electproject.org") 
+
 save.image.file <- "D:/Research/Turnout/Voter Files/Analyze/ME/ME_abs_0915.jpg"
 ggsave(save.image.file, device = "jpeg")
+
+write.table(currentstat, "D:/Research/Turnout/Voter Files/Analyze/ME/current_stats.csv", sep = ",", quote = TRUE, dec = ".", col.names = TRUE, row.names = FALSE)
 
 

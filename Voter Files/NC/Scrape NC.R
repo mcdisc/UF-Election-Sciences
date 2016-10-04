@@ -734,13 +734,13 @@ age.title <- paste("NC New Voter Registrations for Week Ending ",substr(current.
 age.title
 
 par(mar=c(5.1, 4.1, 4.1, 7.1), xpd=TRUE)
-barplot(data, main = age.title, xlab = "Age", ylab ="New Reg", col=c("blue","green","red","yellow"), ylim=c(0, 2500), width=2)
+barplot(data, main = age.title, xlab = "Age", ylab ="New Reg", col=c("blue","green","red","yellow"), ylim=c(0, 3000), width=2)
 legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
 
 save.image.file <- paste(working.dir,"NC_newreg_by_age_",current.date,".png", sep="")
 
 png(file = save.image.file)
-barplot(data, main = age.title, xlab = "Age", ylab ="New Reg", col=c("blue","green","red","yellow"), ylim=c(0, 2500), width=2)
+barplot(data, main = age.title, xlab = "Age", ylab ="New Reg", col=c("blue","green","red","yellow"), ylim=c(0, 3000), width=2)
 legend("topright", fill=c("blue","green","red","yellow"), legend=rownames(data))
 dev.off()
 

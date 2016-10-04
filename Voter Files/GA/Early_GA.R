@@ -60,7 +60,7 @@ table(currentabs$app_status)
 # read in the voter file
 
 readcolumns = c(rep("character",63))
-currentvoters <- read.csv("D:/Research/Turnout/Voter Files/GA/Georgia_Daily_VoterBase.txt", header = TRUE, sep = "|", quote = "\"", dec = ".", fill = TRUE, colClasses = readcolumns, stringsAsFactors = FALSE)
+currentvoters <- read.csv("D:/Research/Turnout/Voter Files/GA/Georgia_Daily_VoterBase.txt", header = TRUE, sep = "|", quote = "", dec = ".", fill = TRUE, colClasses = readcolumns, stringsAsFactors = FALSE)
 
 keepvars <- c("REGISTRATION_NUMBER","VOTER_STATUS","RACE","GENDER","BIRTHDATE","PARTY_LAST_VOTED")
 
@@ -87,7 +87,7 @@ currentabs$age4[currentabs$age>59] <- 4
 
 table(currentabs$age4)
 
-query1 <- sqldf("SELECT county, RACE, GENDER, age, age4 FROM currentabs WHERE (app_status !='R' AND ballot_status!='C')")
+query1 <- sqldf("SELECT county, RACE, GENDER, age, age4, BIRTHDATE FROM currentabs WHERE (app_status !='R' AND ballot_status!='C')")
 
 # Race
 
@@ -120,7 +120,8 @@ bar.req.race.grob <- ggplotGrob(ggplot(data = req.race,aes(x=Race, y = Requests,
  geom_bar(stat="identity") +
  labs(y = "Ballot Requests", x = "") +
  guides(fill=FALSE) +
- theme_minimal())
+ theme_minimal()+
+ theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
 
 # Gender
 
@@ -173,6 +174,16 @@ bar.age.grob <- ggplotGrob(ggplot(query2, aes(x=age, y= requests, width=1)) +
   scale_x_continuous(breaks=c(25,50,75,100)) +
   theme(axis.title.x = element_text(size=10)))
 
+
+query2 <- sqldf("SELECT BIRTHDATE, Count(BIRTHDATE) AS requests FROM currentvoters GROUP BY BIRTHDATE")
+
+ggplot(query2, aes(x=BIRTHDATE, y= requests, width=1)) + 
+  geom_bar(stat="identity", fill="brown4")+
+  theme_minimal()+
+  labs(y = "Registered Voters", x = "Birth Year")+
+  scale_y_continuous(labels = scales::comma) +
+  theme(axis.title.x = element_text(size=10))
+
 # Age 4 categories (for Associated Press)
 
 query2 <- sqldf("SELECT age4, COUNT(age4) AS reqs FROM query1 GROUP BY age4")
@@ -202,25 +213,26 @@ acc.race[3,1] <- "Hispanic"
 acc.race[4,1] <- "Other"
 acc.race[5,1] <- "Unknown"
 
-acc.race[1,2] <- acc.temp[8,2]
-acc.race[2,2] <- acc.temp[4,2]
-acc.race[3,2] <- acc.temp[5,2]
-acc.race[4,2] <- acc.temp[1,2]+acc.temp[6,2]+acc.temp[2,2]+acc.temp[3,2]
-acc.race[5,2] <- acc.temp[7,2]+acc.temp[9,2]
-
-table(query1$RACE)
+acc.race[1,2] <- data.frame(acc.temp[acc.temp$Var1=="WH",2])[1,1]
+acc.race[2,2] <- data.frame(acc.temp[acc.temp$Var1=="BH",2])[1,1]
+acc.race[3,2] <- data.frame(acc.temp[acc.temp$Var1=="HP",2])[1,1]
+acc.race[4,2] <- data.frame(acc.temp[acc.temp$Var1=="AP",2])[1,1]+data.frame(acc.temp[acc.temp$Var1=="AI",2])[1,1]+data.frame(acc.temp[acc.temp$Var1=="OT",2])[1,1]
+acc.race[5,2] <- data.frame(acc.temp[acc.temp$Var1=="U",2])[1,1]+data.frame(acc.temp[is.na(acc.temp$Var1),2])[1,1]
 
 acc.race
 
-colSums(acc.race$Accepted)
+table(query1$RACE)
+
+colSum(acc.race$Accepted)
 
 bar.acc.race.grob <- ggplotGrob(ggplot(data = acc.race,aes(x=Race, y = Accepted, fill=Race)) + 
  scale_fill_manual(values=c("grey20","gold","thistle1","coral3","antiquewhite1")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
- labs(y = "Ballot Requests", x = "") +
+ labs(y = "Accepted Ballots", x = "") +
  guides(fill=FALSE) +
- theme_minimal())
+ theme_minimal()+
+ theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
 
 # Gender
 
@@ -228,7 +240,7 @@ acc.temp <- data.frame(table(query1$GENDER, exclude = NULL))
 acc.temp
 sum(acc.temp$Freq)
 
-acc.gender <- read.table(text ="", colClasses = c("character", "numeric"), col.names = c("Gender","Requests"))
+acc.gender <- read.table(text ="", colClasses = c("character", "numeric"), col.names = c("Gender","Accepted"))
 
 acc.gender[1,1] <- "Women"
 acc.gender[2,1] <- "Men"
@@ -244,7 +256,7 @@ bar.acc.gender.grob <- ggplotGrob(ggplot(data = acc.gender,aes(x=Gender, y = Acc
  scale_fill_manual(values=c("darkolivegreen","gray","coral")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
- labs(y = "Ballot Requests", x = "") +
+ labs(y = "Accepted Ballots", x = "") +
  guides(fill=FALSE) +
  theme_minimal())
 
@@ -257,7 +269,7 @@ query2$age<-as.numeric(query2$age)
 bar.acc.age.grob <- ggplotGrob(ggplot(query2, aes(x=age, y= Accepted, width=1)) + 
   geom_bar(stat="identity", fill="brown4")+
   theme_minimal()+
-  labs(y = "Ballot Requests", x = "Age")+
+  labs(y = "Accepted Ballots", x = "Age")+
   scale_y_continuous(labels = scales::comma) +
   scale_x_continuous(breaks=c(25,50,75,100)) +
   theme(axis.title.x = element_text(size=10)))
@@ -274,18 +286,22 @@ query2
 requested.label <- paste("Ballot Requests: ",as.character(formatC(sum(req.race$Requests), format = "d", big.mark=',')))
 requested.label
 
-accepted.label <- paste("Accepted Ballots: ",as.character(formatC(sum(acc.race$Accepted), format = "d", big.mark=',')))
+accepted.label <- paste("Accepted Ballots: ",as.character(formatC(nrow(query1), format = "d", big.mark=',')))
 accepted.label
 
 base <- data.frame(x = 1:10 , y = 1:5)
 ggplot(base, aes(x, y)) +
   theme_nothing() +
-  annotation_custom(logo.grob, xmin=1, xmax=2.5, ymin=1.5, ymax=1) +
-  annotate("text",x=1.95,y=1.07,label="www.electproject.org", size=3) +
-  annotation_custom(bar.req.race.grob, xmin=3, xmax=8, ymin=3.3, ymax=4.7) +
-  annotation_custom(bar.req.age.grob, xmin=3, xmax=8, ymin=2, ymax=3.5) +
-  annotation_custom(bar.req.gender.grob, xmin=3, xmax=8, ymin=.8, ymax=2.2) +
-  annotate("text",x=5.65,y=4.9,label=requested.label)
+  annotation_custom(logo.grob, xmin=1, xmax=2.5, ymin=.95, ymax=1.35) +
+  annotate("text",x=1.95,y=.98,label="www.electproject.org", size=3) +
+  annotation_custom(bar.req.race.grob, xmin=6, xmax=10, ymin=3.2, ymax=4.8) +
+  annotation_custom(bar.acc.race.grob, xmin=2, xmax=6, ymin=3.2, ymax=4.8) +
+  annotation_custom(bar.req.age.grob, xmin=6, xmax=10, ymin=2, ymax=3.4) +
+  annotation_custom(bar.acc.age.grob, xmin=2, xmax=6, ymin=2, ymax=3.4) +
+  annotation_custom(bar.req.gender.grob, xmin=6, xmax=10, ymin=.8, ymax=2.1) +
+  annotation_custom(bar.acc.gender.grob, xmin=2, xmax=6, ymin=.8, ymax=2.1) +
+  annotate("text",x=8.4,y=4.95,label=requested.label) +
+  annotate("text",x=4.2,y=4.95,label=accepted.label)
 
-save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/GA/GA_abs_0922.jpg", sep="")
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/GA/GA_abs_1003.jpg", sep="")
 ggsave(save.image.file, device = "jpeg")

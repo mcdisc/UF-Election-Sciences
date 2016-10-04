@@ -101,7 +101,7 @@ party_2012 <- party_2012[party_2012$req_dt>as.Date("2012-09-05") & party_2012$re
 
 # Compute days from election
 
-party_2012$countdown12 <- as.Date("2012-11-06") - party_2012$req_dt
+party_2012$countdown12 <- as.Date("2012-11-05") - party_2012$req_dt
 party_2012
 
 Current.relative.day <- as.Date("2016-11-08") - as.Date(Sys.Date())
@@ -120,7 +120,7 @@ levels(abs.2012$voter_party_code)[levels(abs.2012$voter_party_code)=="DEM"] <- "
 levels(abs.2012$voter_party_code)[levels(abs.2012$voter_party_code)=="LIB"] <- "Lib 2012"
 levels(abs.2012$voter_party_code)[levels(abs.2012$voter_party_code)=="REP"] <- "Rep 2012"
 levels(abs.2012$voter_party_code)[levels(abs.2012$voter_party_code)=="UNA"] <- "Una 2012"
-
+query
 combined <- rbind(query,abs.2012)
 combined
 combined$voter_party_code <- as.factor(combined$voter_party_code)
@@ -129,10 +129,13 @@ ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) 
  scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","pink","red2","khaki","gold3")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
- labs(y = "Ballot Requests", x = "") +
+ labs(y = "Ballot Requests", x = "", title = "NC Absentee Ballot Requests") +
  guides(fill=FALSE) +
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=11))
+
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_party_1002.jpg", sep="")
+ggsave(save.image.file, device = "jpeg")
 
 bar.party.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
  scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","pink","red2","khaki","gold3")) +
@@ -346,7 +349,7 @@ accepted_party_2012 <- ddply(temp, .(voter_party_code), transform, Cumulative.Su
 
 # Compute days from election
 
-accepted_party_2012$countdown12 <- as.Date("2012-11-06") - accepted_party_2012$rtn_dt
+accepted_party_2012$countdown12 <- as.Date("2012-11-05") - accepted_party_2012$rtn_dt
 accepted_party_2012
 
 Current.relative.day <- as.Date("2016-11-08") - as.Date(Sys.Date())
@@ -548,7 +551,7 @@ ggplot(base, aes(x, y)) +
   annotate("text",x=3.5,y=5,label=accepted.label) +
   annotate("text",x=8,y=5,label=requested.label)
 
-save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_0921.jpg", sep="")
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_1004.jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
 
 reqs.T

@@ -36,12 +36,12 @@ logo.grob <- rasterGrob(logo, interpolate=TRUE)
 # Appears the file name will change each week, will need to change it
 #
 
-url <- "http://www.maine.gov/sos/cec/elec/data/absentee-voter-file91516.txt"
-destfile <- "D:/Research/Turnout/Voter Files/Analyze/ME/absentee-voter-file91516.txt"
+url <- "http://www.maine.gov/sos/cec/elec/data/absentee-voter-file10316.txt"
+destfile <- "D:/Research/Turnout/Voter Files/Analyze/ME/absentee-voter-file92716.txt"
 
 download.file(url, destfile, mode = "wb")
 
-current.file <- paste(working.dir,"absentee-voter-file91516.txt", sep="")
+current.file <- paste(working.dir,"absentee-voter-file92716.txt", sep="")
 
 currentabs <- read.csv(current.file, header = TRUE, sep = "|", quote = "\"", dec = ".", fill = TRUE, stringsAsFactors = FALSE)
 names(currentabs)[names(currentabs)=="ACC.OR.REJ"]<-"ACCORREJ"
@@ -61,7 +61,7 @@ names(lastabs)[names(lastabs)=="ACC.OR.REJ"]<-"ACCORREJ"
 
 lastabs$reqdt <- as.Date(lastabs$REQDATE, format="%m/%d/%Y")
 
-reldate <- as.Date("9/14/2012", format="%m/%d/%Y")
+reldate <- as.Date("10/01/2012", format="%m/%d/%Y")
 
 temp <- lastabs[which(lastabs$reqdt<reldate),]
 
@@ -85,7 +85,17 @@ querylast_p[5,1] <- "Una 2012"
 
 querylast_p
 
+# get total counts 
+
+querycurrent_p <- sqldf("SELECT P FROM currentabs WHERE (DUP Is Null AND P<>'')")
+
+reqs.T <- nrow(querycurrent_p)
+reqs.T
+
+# By party
+
 querycurrent_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM currentabs WHERE (DUP Is Null AND P<>'') GROUP BY P")
+
 querycurrent_p
 
 sum(querycurrent_p$req)
@@ -111,7 +121,7 @@ ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) 
  scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","mediumorchid1","mediumorchid4","pink","red2","khaki","gold3")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
- labs(y = "Requested Ballots", x = "", title ="Maine Statewide Ballot Requests as of 9/15") +
+ labs(y = "Requested Ballots", x = "", title ="Maine Statewide Requested Ballots", size=4) +
  guides(fill=FALSE) +
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8))
@@ -120,7 +130,7 @@ bar.party.all.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, 
  scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","mediumorchid1","mediumorchid4","pink","red2","khaki","gold3")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
- labs(y = "Requested Ballots", x = "", title ="Maine Statewide Ballot Requests as of 9/15") +
+ labs(y = "Requested Ballots", x = "", title ="Maine Statewide Requested Ballots", size=2.5) +
  guides(fill=FALSE) +
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
@@ -144,6 +154,8 @@ querylast_p[4,1] <- "Rep 2012"
 querylast_p[5,1] <- "Una 2012"
 
 querylast_p
+
+querycurrent_p <- sqldf("SELECT P FROM currentabs WHERE (DUP Is Null AND P<>'' AND CG=1)")
 
 querycurrent_p <- sqldf("SELECT P, Count('VOTER ID') AS req FROM currentabs WHERE (DUP Is Null AND P<>'' AND CG=1) GROUP BY P")
 querycurrent_p
@@ -170,7 +182,7 @@ bar.party.cd1.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, 
  scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","mediumorchid1","mediumorchid4","pink","red2","khaki","gold3")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
- labs(y = "Requested Ballots", x = "", title ="Maine CD1 Ballot Requests as of 9/15") +
+ labs(y = "Requested Ballots", x = "", title ="Maine CD1 Requested Ballots", size=2.5) +
  guides(fill=FALSE) +
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
@@ -221,7 +233,7 @@ bar.party.cd2.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, 
  scale_fill_manual(values=c("lightskyblue","blue","palegreen","green","mediumorchid1","mediumorchid4","pink","red2","khaki","gold3")) +
  scale_y_continuous(labels = scales::comma) +
  geom_bar(stat="identity") +
- labs(y = "Requested Ballots", x = "", title ="Maine CD2 Ballot Requests as of 9/15") +
+ labs(y = "Requested Ballots", x = "", title ="Maine CD2 Requested Ballots", size=2.5) +
  guides(fill=FALSE) +
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8)))
@@ -244,21 +256,24 @@ querycurrent_p_a <- sqldf("SELECT P, Count('VOTER ID') AS acc FROM currentabs WH
 querycurrent_p_a
 
 
-
 #################
 # Combine Plots #
 #################
 
+requested.label <- paste("Requested Ballots: ",as.character(formatC(sum(reqs.T), format = "d", big.mark=',')))
+requested.label
+
 base <- data.frame(x = 1:10 , y = 1:5)
 ggplot(base, aes(x, y)) +
   theme_nothing() +
-  annotation_custom(logo.grob, xmin=.5, xmax=3.1, ymin=0.5, ymax=2.5) +
-  annotation_custom(bar.party.all.grob, xmin=3, xmax=8.5, ymin=3.6, ymax=5) +
-  annotation_custom(bar.party.cd1.grob, xmin=3, xmax=8.5, ymin=2.1, ymax=3.6) +
+  annotation_custom(logo.grob, xmin=.6, xmax=2.8, ymin=0.5, ymax=2.2) +
+  annotate("text",x=1.7,y=1.1,label="www.electproject.org", size=3)+
+  annotation_custom(bar.party.all.grob, xmin=3, xmax=8.5, ymin=3.3, ymax=4.7) +
+  annotation_custom(bar.party.cd1.grob, xmin=3, xmax=8.5, ymin=2.0, ymax=3.4) +
   annotation_custom(bar.party.cd2.grob, xmin=3, xmax=8.5, ymin=.7, ymax=2.1) +
-  annotate("text",x=1.7,y=1.25,label="www.electproject.org") 
+  annotate("text",x=6,y=4.95,label=requested.label)
 
-save.image.file <- "D:/Research/Turnout/Voter Files/Analyze/ME/ME_abs_0915.jpg"
+save.image.file <- "D:/Research/Turnout/Voter Files/Analyze/ME/ME_abs_1003.jpg"
 ggsave(save.image.file, device = "jpeg")
 
 write.table(currentstat, "D:/Research/Turnout/Voter Files/Analyze/ME/current_stats.csv", sep = ",", quote = TRUE, dec = ".", col.names = TRUE, row.names = FALSE)

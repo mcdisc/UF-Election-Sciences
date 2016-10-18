@@ -304,5 +304,5 @@ ggplot(base, aes(x, y)) +
   annotate("text",x=8.4,y=4.95,label=requested.label) +
   annotate("text",x=4.2,y=4.95,label=accepted.label)
 
-save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/GA/GA_abs_1016.jpg", sep="")
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/GA/GA_abs_1017.jpg", sep="")
 ggsave(save.image.file, device = "jpeg")

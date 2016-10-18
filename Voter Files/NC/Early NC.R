@@ -134,7 +134,7 @@ ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) 
  theme_minimal()+
  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=11))
 
-save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_party_1002.jpg", sep="")
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_party_1016.jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
 
 bar.party.grob <- ggplotGrob(ggplot(data = combined,aes(x=voter_party_code, y = req, fill=voter_party_code)) + 
@@ -551,7 +551,7 @@ ggplot(base, aes(x, y)) +
   annotate("text",x=3.5,y=5,label=accepted.label) +
   annotate("text",x=8,y=5,label=requested.label)
 
-save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_1004.jpg", sep="")
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/NC/NC_abs_1017.jpg", sep="")
 ggsave(save.image.file, device = "jpeg")
 
 reqs.T

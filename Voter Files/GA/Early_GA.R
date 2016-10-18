@@ -80,7 +80,8 @@ table(currentabs$age)
 
 # four age categories for Associated Press
 
-currentabs$age4 <- 1
+currentabs$age4 <- 0
+currentabs$age4[currentabs$age>17] <- 1
 currentabs$age4[currentabs$age>29] <- 2
 currentabs$age4[currentabs$age>44] <- 3
 currentabs$age4[currentabs$age>59] <- 4
@@ -303,5 +304,5 @@ ggplot(base, aes(x, y)) +
   annotate("text",x=8.4,y=4.95,label=requested.label) +
   annotate("text",x=4.2,y=4.95,label=accepted.label)
 
-save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/GA/GA_abs_1003.jpg", sep="")
+save.image.file <- paste("D:/Research/Turnout/Voter Files/Analyze/GA/GA_abs_1016.jpg", sep="")
 ggsave(save.image.file, device = "jpeg")

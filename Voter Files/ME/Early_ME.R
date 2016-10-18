@@ -36,7 +36,7 @@ logo.grob <- rasterGrob(logo, interpolate=TRUE)
 # Appears the file name will change each week, will need to change it
 #
 
-url <- "http://www.maine.gov/sos/cec/elec/data/absentee-voter-file10316.txt"
+url <- "http://www.maine.gov/sos/cec/elec/data/absentee-voter-file101116.txt"
 destfile <- "D:/Research/Turnout/Voter Files/Analyze/ME/absentee-voter-file92716.txt"
 
 download.file(url, destfile, mode = "wb")
@@ -61,7 +61,7 @@ names(lastabs)[names(lastabs)=="ACC.OR.REJ"]<-"ACCORREJ"
 
 lastabs$reqdt <- as.Date(lastabs$REQDATE, format="%m/%d/%Y")
 
-reldate <- as.Date("10/01/2012", format="%m/%d/%Y")
+reldate <- as.Date("10/09/2012", format="%m/%d/%Y")
 
 temp <- lastabs[which(lastabs$reqdt<reldate),]
 
@@ -273,7 +273,7 @@ ggplot(base, aes(x, y)) +
   annotation_custom(bar.party.cd2.grob, xmin=3, xmax=8.5, ymin=.7, ymax=2.1) +
   annotate("text",x=6,y=4.95,label=requested.label)
 
-save.image.file <- "D:/Research/Turnout/Voter Files/Analyze/ME/ME_abs_1003.jpg"
+save.image.file <- "D:/Research/Turnout/Voter Files/Analyze/ME/ME_abs_1011.jpg"
 ggsave(save.image.file, device = "jpeg")
 
 write.table(currentstat, "D:/Research/Turnout/Voter Files/Analyze/ME/current_stats.csv", sep = ",", quote = TRUE, dec = ".", col.names = TRUE, row.names = FALSE)

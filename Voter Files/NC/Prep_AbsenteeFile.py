@@ -66,6 +66,7 @@ try:
         #Load data in- much faster than data import wizard in MySQL
 
         sql = "LOAD DATA INFILE '/Users/Potalora/Desktop/absentee11xx08xx2016-6.csv' " \
+        sql = "LOAD DATA INFILE '/Users/Potalora/Desktop/absentee11xx08xx2016-7.csv' " \
               "INTO TABLE {0} " \
               "FIELDS TERMINATED BY ',' " \
               "ENCLOSED BY '\"' " \

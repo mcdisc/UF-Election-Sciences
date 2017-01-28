@@ -33,6 +33,32 @@ for (file in file_list){
     rm(temp_dataset)
   }
   
+}
+colnames(FLDataset)<- c("county", "state_voter_ID", "last_name", "first_name", "middle_name", "address1", "address2", "address3", "city","zip_code","gender","race","date_of_registration","birth_date","party")
+FLDataset$state = "Florida"
+FLDataset$address4 = NA
+FLDataset$address5 = NA
+FLDataset$voter_status = NA
+FLDataset <- FLDataset[, order(colnames(FLDataset))]
+NatDataset <- rbind(NatDataset, FLDataset)
+
+#Colorado
+#sadly, the Colorado file is just a ton of individual files written in the format 'Registered_Voters_List_Part[x]_[MM]_[DD]_[YYYY]_[hh]_[mm]_[ss].txt.gz'
+#also, the voterID column is irregular because the individual codes have a different number of digits, more on that later
+
+setwd("~/Documents/Data_Projects/National Voter Data File/Colorado/Voter Files/VoterFiles")
+file_list <- list.files("~/Documents/Data_Projects/National Voter Data File/Colorado/Voter Files/VoterFiles")
+library(data.table)
+readcols <- c("character", "character", "character", "character", "character", "NULL", "character", "NULL", "NULL", "NULL", "NULL", "character", "NULL", "NULL", "character", "character", "NULL", "NULL", "character", "character", "character", "character", "character", rep("NULL",9), "character", "character", "character", "character", rep("NULL", 115))
+
+for (file in file_list){
+  
+  # if the merged dataset doesn't exist, create it
+  if (!exists("dataset")){
+    dataset <- read.csv(file, header=TRUE, nrows = 100, colClasses = readcols)
+    
+  }
+  
   # if the merged dataset does exist, append to it
   if (exists("dataset")){
     temp_dataset <-read.csv(file, header=TRUE, nrows = 100, colClasses = readcols)

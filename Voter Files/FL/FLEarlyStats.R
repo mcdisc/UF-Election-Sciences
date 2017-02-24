@@ -31,8 +31,9 @@ FLVote2016$EleDay[FLVote2016$`History Code` == 'Y'] <- 1
 # Collapse History Code Types
 
 FLTest2016 <- FLVote2016 %>% 
-  group_by(`County Code`,`Voter ID`) %>% 
+  group_by(`Voter ID`) %>% 
   summarise_each(funs(sum), Absentee, AbsenteeRej, Early, NoVote, ProvRej, EleDay)
+
 
 # Get rid of duplicates but keep data
 
@@ -53,6 +54,9 @@ FLTest2016$Total <- FLTest2016$Absentee +  + FLTest2016$Early + FLTest2016$EleDa
 FLTest2016$TotalActual <- 0
 FLTest2016$TotalActual[FLTest2016$Total >= 1] <- 1
 
+FLTest2016$TotalEarlyAll <- 0
+FLTest2016$TotalEarlyAll[(FLTest2016$TotalEarly + FLTest2016$TotalAbsentee) >= 1] <- 1
+
 # Do the same with 2012
 
 FLVote2012$Early <- 0
@@ -70,7 +74,7 @@ FLVote2012$ProvRej[FLVote2012$`History Code` == 'P'] <- 1
 FLVote2012$EleDay[FLVote2012$`History Code` == 'Y'] <- 1
 
 FLTest2012 <- FLVote2012 %>% 
-  group_by(`County Code`,`Voter ID`) %>% 
+  group_by(`Voter ID`) %>% 
   summarise_each(funs(sum), Absentee, AbsenteeRej, Early, NoVote, ProvRej, EleDay)
 
 
@@ -88,16 +92,44 @@ FLTest2012$TotalActual[FLTest2012$Total >= 1] <- 1
 
 # Join 2016 voters with 2012 without losing any observations
 
-FL1216 <- full_join(FLTest2016, FLTest2012, by = c('County Code', 'Voter ID'))
+FL1216 <- full_join(FLTest2016, FLTest2012, by = 'Voter ID')
 
 # Join 2016 voters with voter file for race
 
-FL2016joined <- left_join(FLTest2016, FLVoterFileLess, by = c('County Code', 'Voter ID'))
+FL2016joined <- left_join(FLTest2016, FLVoterFileLess, by = 'Voter ID')
+
+write.csv(FL2016joined, 'FLVotHis2016Clean.csv', row.names = FALSE)
+
+FL2016joined <- fread('/Users/Potalora/Documents/UF_Elections/FL_Early_Voting/FLVotHis2016Clean.csv')
 
 # Black voters by County
 
+FLFIPS <- fread('/Users/Potalora/Desktop/FLFIPS.csv')
+
+
+processethnic <- function(df, fips, ethniccode, name){
+  ethnicdf <- df %>%
+    filter(Race == ethniccode) %>%
+    group_by(`County Code`) %>%
+    summarise_each(funs(sum), TotalEarly, TotalAbsentee, TotalActual)
+  
+  # Simple early vote ratio
+  
+  ethnicdf$EarlyRatio <- ethnicdf$TotalEarly/ethnicdf$TotalActual
+  ethnicdf$AbsenteeRatio <- ethnicdf$TotalAbsentee/ethnicdf$TotalActual
+  write.csv(ethnicdf, paste(name, ".csv", sep = ''), row.names = FALSE)
+  ethnicdf
+}
+
+
+FL2016BlackbyCounty <- processethnic(FL2016joined, FLFIPS, 3, 'FL2016BlackEarly')
+
+FL2016WhitebyCounty <- processethnic(FL2016joined, FLFIPS, 5, 'FL2016WhiteEarly')
+
+FL2016HispanicbyCounty <- processethnic(FL2016joined, FLFIPS, 4, 'FL2016HispanicEarly')
+
 FL2016BlackbyCounty <- FL2016joined %>%
-  filter(Race == 3) %>%
+  filter(Race == 5) %>%
   group_by(`County Code`) %>%
   summarise_each(funs(sum), TotalEarly, TotalActual)
 
@@ -107,13 +139,12 @@ FL2016BlackbyCounty$EarlyRatio <- FL2016BlackbyCounty$TotalEarly/FL2016BlackbyCo
 
 # Read in FIPS codes
 
-FLFIPS <- fread('/Users/Potalora/Desktop/FLFIPS.csv')
 
 # Join in FIPS codes
 
-FL2016BlackbyCounty <- left_join(FL2016BlackbyCounty, FLFIPS, by = "County Code")
+FL2016WhitebyCounty <- left_join(FL2016BlackbyCounty, FLFIPS, by = "County Code")
 
 # Read out file
 
-write.csv(FL2016BlackbyCounty, "FL2016BlackEarly.csv", row.names = FALSE)
+write.csv(FL2016WhitebyCounty, "FL2016WhiteEarly.csv", row.names = FALSE)
 

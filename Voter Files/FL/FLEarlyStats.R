@@ -2,6 +2,7 @@ library(data.table)
 library(dplyr)
 library(tidyr)
 library(magrittr)
+library(multidplyr)
 
 FLVoterFile <- fread('/Users/Potalora/Downloads/20170110_VoterDetail/FLASTATEWIDE20170110.csv', colClasses = c("Voter ID" = "character"))
 FLVoteHis <- fread('/Users/Potalora/Downloads/20170110_VoterHistory/FLAHIS20170110.csv', colClasses = c("Voter ID" = "character"))
@@ -117,10 +118,20 @@ processethnic <- function(df, fips, ethniccode, name){
   
   ethnicdf$EarlyRatio <- ethnicdf$TotalEarly/ethnicdf$TotalActual
   ethnicdf$AbsenteeRatio <- ethnicdf$TotalAbsentee/ethnicdf$TotalActual
+  ethnicdf <- left_join(ethnicdf, FLFIPS, by = "County Code")
   write.csv(ethnicdf, paste(name, ".csv", sep = ''), row.names = FALSE)
   ethnicdf
 }
 
+
+ethnictotbycounty <- function(){
+  df <- FLVoterFileLess %>%
+    partition(`County Code`) %>%
+    spread(Race) %>%
+    group_by(`County Code`)
+}
+
+df <- ethnictotbycounty()
 
 FL2016BlackbyCounty <- processethnic(FL2016joined, FLFIPS, 3, 'FL2016BlackEarly')
 
@@ -128,23 +139,17 @@ FL2016WhitebyCounty <- processethnic(FL2016joined, FLFIPS, 5, 'FL2016WhiteEarly'
 
 FL2016HispanicbyCounty <- processethnic(FL2016joined, FLFIPS, 4, 'FL2016HispanicEarly')
 
-FL2016BlackbyCounty <- FL2016joined %>%
-  filter(Race == 5) %>%
+
+allethnicdf <- FL2016joined %>%
   group_by(`County Code`) %>%
-  summarise_each(funs(sum), TotalEarly, TotalActual)
+  summarise_each(funs(sum), TotalEarly, TotalAbsentee, TotalActual)
 
 # Simple early vote ratio
 
-FL2016BlackbyCounty$EarlyRatio <- FL2016BlackbyCounty$TotalEarly/FL2016BlackbyCounty$TotalActual
+allethnicdf$EarlyRatio <- allethnicdf$TotalEarly/allethnicdf$TotalActual
+allethnicdf$AbsenteeRatio <- allethnicdf$TotalAbsentee/allethnicdf$TotalActual
+allethnicdf <- left_join(allethnicdf, FLFIPS, by = "County Code")
+write.csv(allethnicdf, paste('FL2016AllEarly', ".csv", sep = ''), row.names = FALSE)
 
-# Read in FIPS codes
 
-
-# Join in FIPS codes
-
-FL2016WhitebyCounty <- left_join(FL2016BlackbyCounty, FLFIPS, by = "County Code")
-
-# Read out file
-
-write.csv(FL2016WhitebyCounty, "FL2016WhiteEarly.csv", row.names = FALSE)
 
